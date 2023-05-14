@@ -5,6 +5,7 @@ import datetime
 import logging
 
 import helper.binance
+import helper.sqlmanager
 # import helper.training
 import helper.config
 import helper.functions
@@ -97,3 +98,5 @@ while True:
         time.sleep(60)
 
     time.sleep(15)
+
+# docker run -v ./:/mining/ trading_signals

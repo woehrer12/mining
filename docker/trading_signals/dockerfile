@@ -22,4 +22,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /mining
 
-CMD [ "python", "/mining/Python/trading_signals.py" ]
+CMD [ "python", "-u", "/mining/Python/trading_signals.py" ]

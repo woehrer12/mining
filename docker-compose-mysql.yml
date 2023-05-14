@@ -35,8 +35,7 @@ services:
     ports:
       - 5000:5000
     volumes:
-    - ./logs:/mining/logs
-    - ./config:/mining/config
+    - ./:/mining/
 
   grafana:
     depends_on:

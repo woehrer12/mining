@@ -1,0 +1,7 @@
+requests
+pandas
+numpy
+python-binance
+matplotlib
+scikit-learn
+tensorflow
