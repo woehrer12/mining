@@ -9,12 +9,16 @@ import helper.groovesensor
 
 helper.functions.initlogger("wakue.log")
 
+def loop():
+    while True:
+        os.system('clear')
 
-while True:
-    os.system('clear')
+        helper.groovesensor.check()
 
-    helper.groovesensor.check()
+        helper.arduserial.read()
 
-    helper.arduserial.read()
+        time.sleep(10)
 
-    time.sleep(10)
+
+if __name__ == "__main__":
+    loop()
