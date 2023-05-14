@@ -1,0 +1,10 @@
+config.ini
+logs/
+KI/
+Data/
+my_dir/
+*.pyc
+*.db
+mysql/
+Python/strategies/strategie.json
+test.py

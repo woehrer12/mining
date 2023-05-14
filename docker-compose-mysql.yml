@@ -1,0 +1,63 @@
+version : '3.7'
+
+services:
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql:/var/lib/mysql
+    restart: always
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - 8183:80
+
+  miningapi:
+    depends_on:
+      - mysql
+    image: miningapi
+    container_name: miningapi
+    restart: always
+    ports:
+      - 5000:5000
+    volumes:
+    - ./logs:/mining/logs
+    - ./config:/mining/config
+
+  grafana:
+    depends_on:
+      - mysql
+    image: grafana/grafana
+    user: "104"
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+    restart: always
+
+  hiveos:
+    image: hiveos
+    container_name: hiveos
+    restart: always
+    volumes:
+    - ./:/mining/
+
+volumes:
+  grafana:

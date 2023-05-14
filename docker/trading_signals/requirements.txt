@@ -1,0 +1,6 @@
+numpy>=1.21.0
+pandas>=1.4.4
+python-telegram-bot>=20.0
+requests>=2.22.0
+scikit_learn>=1.2.0
+python-binance>=1.0.16

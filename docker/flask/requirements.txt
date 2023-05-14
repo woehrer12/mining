@@ -1,0 +1,6 @@
+numpy>=1.21.0
+pandas>=1.4.4
+requests>=2.22.0
+Flask>=2.2.2
+python-binance>=1.0.16
+python-telegram-bot>=20.0
