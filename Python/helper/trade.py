@@ -50,11 +50,14 @@ def check_order():
     try:
         print()
         trades = helper.sqlmanager.search_new_buys()
+        print(trades)
+        for i in trades:
+            print(i) # TODO stopped here with testing
         if len(trades)>0: print("Open BUY")
         for trade in trades:
             result = helper.binance.check_order(trade[0],trade[1])
             if result['status'] == "FILLED":
-                helper.sqlite.updateBuyTrade(result)
+                helper.sqlmanager.updateBuyTrade(result)
                 logging.info("Buy complete")
                 logging.info(result)
                 helper.telegramsend.send("BUY " + str(trade[0]) + " Price: " + str(trade[5]))
@@ -108,7 +111,7 @@ def check_order():
 
 def check_filled():
     try:
-        trades = helper.sqlite.getSearchFilledBuys()
+        trades = helper.sqlmanager.getSearchFilledBuys()
         price_dict = helper.binance.get_24h_ticker()
         if len(trades)>0: print("Open Trades")
         arr = []
