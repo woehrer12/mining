@@ -16,7 +16,7 @@ sns.set(style='whitegrid', palette='muted', font_scale=1.5)
 
 rcParams['figure.figsize'] = 14, 8
 
-RANDOM_SEED = 42
+RANDOM_SEED = 42 #TODO create a real Random
 
 np.random.seed(RANDOM_SEED)
 
