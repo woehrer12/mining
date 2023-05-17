@@ -10,10 +10,10 @@ import helper.sqlmanager
 import helper.config
 import helper.functions
 # import helper.sqlite
-# import helper.signals
-# import helper.trade
+import helper.signals
+import helper.trade
 import helper.telegramsend
-# import strategies.main
+import strategies.main
 
 warnings.filterwarnings('ignore')
 
@@ -42,11 +42,11 @@ while True:
         print("Fehler bei get_balance in trading_signals.py: " + str(e))
         time.sleep(60)
 
-    helper.trade.check_order()
+    # helper.trade.check_order() TODO
 
     print()
 
-    helper.trade.check_filled()
+    # helper.trade.check_filled() TODO
 
     print()
 
@@ -60,7 +60,7 @@ while True:
             print()
             print(CurrencyPair)
 
-            data = helper.binance.get_klines(CurrencyPair)
+            data = helper.binance.get_klines_1h(CurrencyPair)
 
             prepaired_data = helper.signals.prepair_data(data)
 
@@ -86,9 +86,12 @@ while True:
                 print("Time Treffer")
 
                 # RSI BUY
-                if strategies.main.handler(prepaired_data):
-                    if helper.sqlite.gettradeprotection():
+                data = strategies.main.handler(prepaired_data)
+                if data['enter_long'].iloc[-1] == 1:
+
+                    if helper.sqlmanager.get_trade_protectionBuys():
                         logging.info("Buy Trade Time Protection " + CurrencyPair)
+                    # TODO Tradeprotection Sells
                     elif helper.trade.getportion(CurrencyPair):
                         logging.info("Buy Portion Protection " + CurrencyPair)
                     else:

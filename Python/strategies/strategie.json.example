@@ -1,0 +1,29 @@
+{
+    "RSI_enter" : {
+        "1" : 25.0,
+        "2" : 25.0,
+        "3" : 25.0,
+        "4" : 25.0
+    },
+    "RSI_exit" : {
+        "1" : 85.0,
+        "2" : 85.0,
+        "3" : 85.0,
+        "4" : 85.0
+    },
+
+    "Trailing" : {
+        "Slow" : {
+            "trailingvalue" : 5.0,
+            "trailingoffset" : 10.0
+        },
+        "Middle" : {
+            "trailingvalue" : 5.0,
+            "trailingoffset" : 10.0
+        },
+        "Fast" : {
+            "trailingvalue" : 5.0,
+            "trailingoffset" : 10.0
+        }
+    }
+}
