@@ -6,6 +6,7 @@ import helper.binance
 import helper.sqlmanager
 import helper.telegramsend
 import helper.functions
+import helper.config
 import numpy as np
 from binance.helpers import round_step_size
 
@@ -15,11 +16,10 @@ helper.sqlmanager.init()
 
 kinds = ["Slow", "Middle"]#, "Fast"]
 
-def buy(CurrencyPair):
-    set_size = float(conf['set_size'])
+def buy(CurrencyPair, Size):
     USDT = float(helper.binance.get_balance()['free'])
     for kind in kinds:
-        if float(USDT) > (set_size * 1.01) + float(conf['reserve']) :
+        if float(USDT) > (Size * 1.01) + float(conf['reserve']) :
             print(kind)
             price = helper.binance.get_24h_ticker()
             for dict in price:
@@ -29,18 +29,18 @@ def buy(CurrencyPair):
             ticksize = helper.binance.get_symbol_info(CurrencyPair)['filters'][0]['tickSize']
             stepsize = helper.binance.get_symbol_info(CurrencyPair)['filters'][1]['stepSize'] # TODO Change to 1 Request
 
-            size = round(1/float(price)*set_size,8)
+            Size = round(1/float(price)*Size,8)
             price = round_step_size(float(price),ticksize)
             price = '{0:.8f}'.format(price)
             print("Preis: " + str(price))
 
-            size = round_step_size(size,stepsize)
-            print("Menge: "+ str(size))
-            logging.info("CurrencyPair: "+ str(CurrencyPair) + " Size: " + str(size) + " Price: " + str(price))
-            result = helper.binance.limit_buy(CurrencyPair, size, price, 0)
+            Size = round_step_size(Size,stepsize)
+            print("Menge: "+ str(Size))
+            logging.info("CurrencyPair: "+ str(CurrencyPair) + " Size: " + str(Size) + " Price: " + str(price))
+            result = helper.binance.limit_buy(CurrencyPair, Size, price, 0)
             result['status'] = 'NEW'
             helper.sqlmanager.insert_buy(result,kind)
-            USDT = USDT - set_size * 1.01
+            USDT = USDT - Size * 1.01
             logging.info("Buy ")
             logging.info(result)
         else:
