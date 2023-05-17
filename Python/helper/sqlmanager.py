@@ -1,4 +1,5 @@
 import sqlalchemy as db
+import time
 
 import helper.config
 
@@ -31,3 +32,36 @@ Buys = db.Table('Buys', metadata,
 
 def init():
     metadata.create_all(engine)
+
+def insert_buy(data, kind):
+    buy = Buys()
+    buy.trade_id = data['trade_id']
+    buy.symbol = data['symbol']
+    buy.orderid = data['orderid']
+    buy.orderListId = data['orderListId']
+    buy.clientOrderId = data['clientOrderId']
+    buy.transactTime = data['transactTime']
+    buy.price = data['price']
+    buy.origQty = data['origQty']
+    buy.executedQty = data['executedQty']
+    buy.cummulativeQuoteQty = data['cummulativeQuoteQty']
+    buy.status = data['status']
+    buy.timeInForce = data['timeInForce']
+    buy.type = data['type']
+    buy.side = data['side']
+    buy.sellID = data['sellID']
+    buy.trailingProfit = data['trailingProfit']
+    buy.kind = kind
+    buy.insert(engine)
+
+def search_new_buys():
+    #Search Trades there status is New
+    query = db.select([Buys]).where(Buys.status == 'New')
+    results = engine.execute(query)
+    return results
+
+def get_trade_protectionBuys():
+    protectiontime = (int(time.time()) - 3300)*1000
+    query = db.select([Buys]).where(Buys.transacttime > protectiontime)
+    results = engine.execute(query)
+    return results # TODO testing this
