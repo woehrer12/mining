@@ -70,18 +70,6 @@ while True:
 
             print("Preis:", str(float(prepaired_data['close'].iloc[-2:-1])))
 
-            print("RSI 6: " + str(round(float(prepaired_data['rsi_6'].iloc[-2:-1]),2)))
-            print("RSI 12: " + str(round(float(prepaired_data['rsi_12'].iloc[-2:-1]),2)))
-            print("RSI 24: " + str(round(float(prepaired_data['rsi_24'].iloc[-2:-1]),2)))
-            print("RSI 200: " + str(round(float(prepaired_data['rsi_200'].iloc[-2:-1]),2)))
-
-            print()
-
-            print("SMA 6: " + str(round(float(prepaired_data['sma_6'].iloc[-2:-1]),2)))
-            print("SMA 12: " + str(round(float(prepaired_data['sma_12'].iloc[-2:-1]),2)))
-            print("SMA 24: " + str(round(float(prepaired_data['sma_24'].iloc[-2:-1]),2)))
-            print("SMA 200: " + str(round(float(prepaired_data['sma_200'].iloc[-2:-1]),2)))
-
             if close_time > time_minus_45s:
                 print("Time Treffer")
 

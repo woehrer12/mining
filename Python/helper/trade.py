@@ -146,7 +146,7 @@ def check_filled():
                     trailing = profit - trailingvalue
                     helper.sqlite.updateTrailingTrade(trade[1],trailing)
                 else: 
-                    if profit  > trade[14] + trailingvalue:
+                    if profit > trade[14] + trailingvalue:
                         trailing = profit - trailingvalue
                         helper.sqlite.updateTrailingTrade(trade[1],trailing)
             if not(not trade[14]):
