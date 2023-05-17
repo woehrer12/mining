@@ -84,7 +84,7 @@ while True:
                         logging.info("Buy Portion Protection " + CurrencyPair)
                     else:
                         print("BUY")
-                        helper.trade.buy(CurrencyPair) # TODO
+                        # helper.trade.buy(CurrencyPair) # TODO
 
         time.sleep(60)
 
