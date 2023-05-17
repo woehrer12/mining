@@ -2,11 +2,14 @@ import flask
 
 import helper.functions
 import helper.mysql
+import helper.config
 
 from flask import request, jsonify
 logger = helper.functions.initlogger("API.log")
 
 app = flask.Flask(__name__)
+
+conf = helper.config.initconfig()
 
 helper.mysql.init()
 
@@ -36,4 +39,4 @@ def add_message_arduino(uuid):
 
 
 if __name__ == '__main__':
-    app.run(host= '0.0.0.0',debug=False)
+    app.run(host= conf['host'],debug=False)
