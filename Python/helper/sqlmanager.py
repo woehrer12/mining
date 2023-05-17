@@ -36,8 +36,6 @@ def init():
 def insert_buy(data, kind):
     engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
-    conn = conn.execution_options(isolation_level="READ COMMITTED")
-    print(data)
     query = db.insert(Buys).values(symbol = data['symbol'],
                                    orderid = data['orderId'],
                                    orderListId = data['orderListId'],
@@ -55,20 +53,54 @@ def insert_buy(data, kind):
                                    )
 
     result = conn.execute(query)
-    conn.commit()
     print(result)
     conn.close()
 
 def search_new_buys():
     #Search Trades there status is New
     engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
-    query = db.select([Buys]).where(Buys.status == 'New')
-    results = engine.execute(query)
+    conn = engine.connect()
+    query = db.select(Buys).where(Buys.c.status == 'NEW')
+    results = conn.execute(query)
+    conn.close()
+    return results
+
+def search_filled_buys():
+    #Search Trades there status is Filled
+    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    conn = engine.connect()
+    query = db.select(Buys).where((Buys.status == 'Filled') & (Buys.sellID == ''))
+    results = conn.execute(query)
+    conn.close()
     return results
 
 def get_trade_protectionBuys():
     engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    conn = engine.connect()
     protectiontime = (int(time.time()) - 3300)*1000
-    query = db.select([Buys]).where(Buys.transacttime > protectiontime)
-    results = engine.execute(query)
+    query = db.select(Buys).where(Buys.transacttime > protectiontime)
+    results = conn.execute(query)
+    conn.close()
     return results # TODO testing this
+
+def update_buys(data):
+    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    conn = engine.connect()
+    query = db.update(Buys).where(Buys.orderID == data['orderId']).values(symbol = data['symbol'],
+                                orderid = data['orderId'],
+                                orderListId = data['orderListId'],
+                                clientOrderId = data['clientOrderId'],
+                                transactTime = data['transactTime'],
+                                price = data['price'],
+                                origQty = data['origQty'],
+                                executedQty = data['executedQty'],
+                                cummulativeQuoteQty = data['cummulativeQuoteQty'],
+                                status = data['status'],
+                                timeInForce = data['timeInForce'],
+                                type = data['type'],
+                                side = data['side']
+                                )
+    results = conn.execute(query)
+    conn.close()
+    return results
+
