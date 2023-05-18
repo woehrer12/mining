@@ -46,26 +46,65 @@ def buy(CurrencyPair, Size):
         else:
             print("Not Enougth USDT")
 
+def sell(Id):
+    # Search the Orders in Database
+    trade = helper.sqlmanager.search_id(Id)
+
+    # Get the actual prices
+    price = helper.binance.get_24h_ticker()
+    for dict in price:
+        if dict['symbol'] == trade.symbol:
+            price = float(dict['lastPrice'])*1.0001
+
+    # Get the symbol infos for the right values in trade request
+    ticksize = helper.binance.get_symbol_info(trade.symbol)['filters'][0]['tickSize']
+    stepsize = helper.binance.get_symbol_info(trade.symbol)['filters'][1]['stepSize'] # TODO change to 1 Request
+
+    price = round_step_size(float(price),ticksize)
+    profit = float(((price/trade.price)*100)-100)
+    price = '{0:.8f}'.format(price)
+    print("Preis: " + str(price))
+    
+    size = float(trade[7]) * (1.0-(profit/100.0*0.2))
+    size = round_step_size(size,stepsize)
+    print("Menge: "+ str(size))
+    print("Profit: " + str(round(profit,2)) + "%")
+    
+    logging.info("SELL: " + str(trade.symbol) + ", size: " + str(size) + ", price: " + str(price))
+
+    # Set the Sell Request
+    result = helper.binance.limit_sell(trade[0], size, price)
+
+    result['status'] = 'NEW'
+
+    # Insert into Databse
+    helper.sqlmanager.updateBuywithSellid(result['orderId'], trade.trade_id)
+
+    # Logging
+    logging.info("SELL")
+    logging.info(trade)
+    logging.info(result)
+    logging.info("Size: " + str(size))
+    logging.info("Price: " + str(price))
+
+
+
+
 def check_order():
     try:
         print()
         trades = helper.sqlmanager.search_new_buys()
-        print(trades)
-        for i in trades:
-            print(i) # TODO stopped here with testing
-        if len(trades)>0: print("Open BUY")
         for trade in trades:
-            result = helper.binance.check_order(trade[0],trade[1])
+            result = helper.binance.check_order(trade.symbol,trade.orderid)
             if result['status'] == "FILLED":
-                helper.sqlmanager.updateBuyTrade(result)
+                helper.sqlmanager.update_buys(result, trade.trade_id)
                 logging.info("Buy complete")
                 logging.info(result)
-                helper.telegramsend.send("BUY " + str(trade[0]) + " Price: " + str(trade[5]))
+                helper.telegramsend.send("BUY " + str(trade.symbol) + " Price: " + str(trade.price))
             else:
                 time_now = int(time.time())*1000
                 time_cancel = int(time_now - 3300000)
-                trade_time = int(trade[4])
-                print("Pair: " + str(trade[0]) + "  Price: " + str(trade[5]) + "  Menge: " + str(trade[6]) + "  Time: " + str(datetime.datetime.fromtimestamp(trade[4]/1000)))
+                trade_time = int(trade.transactTime)
                 if trade_time < time_cancel:
                     print("CANCEL")
                     cancel_orderBuys(result)
@@ -75,16 +114,13 @@ def check_order():
         logging.error("Fehler bei checkorder open BUY in trade.py: " + str(e))
         print("Fehler bei checkorder in trade.py: " + str(e))
         time.sleep(60)
-        
-
 
     try:
         trades = helper.sqlmanager.get_trade_protectionBuys()
-        if len(trades)>0: print("Open SELL")
         for trade in trades:
-            result = helper.binance.check_order(trade[0],trade[1])
+            result = helper.binance.check_order(trade.symbol,trade.orderid)
             if result['status'] == "FILLED":
-                helper.sqlite.updateSellTrade(result)
+                helper.sqlmanager.updateSellTrade(result)
                 buytrade = helper.sqlite.getSearchorderId2(trade[13])
                 profit = float(((trade[5]/buytrade[5])*100)-100)
                 profit_USDT = float(result['cummulativeQuoteQty']) - buytrade[8]
@@ -109,18 +145,20 @@ def check_order():
         time.sleep(60)
         
 
+
+
+
 def check_filled():
     try:
-        trades = helper.sqlmanager.getSearchFilledBuys()
+        trades = helper.sqlmanager.search_filled_buys()
         price_dict = helper.binance.get_24h_ticker()
-        if len(trades)>0: print("Open Trades")
         arr = []
         arr_w = []
         arrUSDT = []
         for trade in trades:
 
             for dict in price_dict:
-                if dict['symbol'] == trade[0]:
+                if dict['symbol'] == trade.symbol:
                     price = float(dict['lastPrice'])
             print("Preis: ",price)
 
@@ -128,12 +166,7 @@ def check_filled():
             arr_w = np.append(arr_w,trade[6])
             arrUSDT = np.append(arrUSDT,trade[8])
             profit = float(((price/trade[5])*100)-100)
-            if not trade[14]:
-                trailingstring = "not trailing"
-            else:
-                trailingstring = str(round(trade[14],2)) + "%"
-            print("ID: " + str(trade[15]) + " Pair: " + str(trade[0]) + "  Price: " + str(trade[5]) + "  Menge: " + str(trade[6]) + "  Time: " + str(datetime.datetime.fromtimestamp(trade[4]/1000)) + "  Profit: " + str(round(profit,2)) + "% " + "Trailing: " + trailingstring + " Kind: " + trade[16])
-            
+
             if trade[16] == "Fast":
                 trailingvalue = 1.0
                 trailingoffset = 2.0
@@ -205,49 +238,6 @@ def cancel_orderSells(data, buyId):
         logging.error("Fehler bei cancel_orderSells in trade.py: " + str(e))
         print("Fehler bei cancel_orderSells in trade.py: " + str(e))
         time.sleep(60)
-
-def sell2(Id):
-    # Search the Orders in Database
-    trade = helper.sqlite.getSearchorderId2(Id)
-
-    # Get the actual prices
-    price = helper.binance.get_24h_ticker()
-    for dict in price:
-        if dict['symbol'] == trade[0]:
-            price = float(dict['lastPrice'])*1.0001
-
-    # Get the symbol infos for the right values in trade request
-    ticksize = helper.binance.get_symbol_info(trade[0])['filters'][0]['tickSize']
-    stepsize = helper.binance.get_symbol_info(trade[0])['filters'][1]['stepSize'] # TODO change to 1 Request
-
-    price = round_step_size(float(price),ticksize)
-    profit = float(((price/trade[5])*100)-100)
-    price = '{0:.8f}'.format(price)
-    print("Preis: " + str(price))
-    
-    size = float(trade[7]) * (1.0-(profit/100.0*0.2))
-    size = round_step_size(size,stepsize)
-    print("Menge: "+ str(size))
-    print("Profit: " + str(round(profit,2)) + "%")
-    
-    logging.info("SELL: " + str(trade[0]) + ", size: " + str(size) + ", price: " + str(price))
-
-    # Set the Sell Request
-    result = helper.binance.limit_sell(trade[0], size, price)
-
-    result['status'] = 'NEW'
-
-    # Insert into Databse
-    helper.sqlite.updateBuywithSellid(trade[1], result['orderId'])
-    helper.sqlite.insertSellTrade(result, Id)
-
-    # Logging
-    logging.info("SELL")
-    logging.info(trade)
-    logging.info(result)
-    logging.info("Size: " + str(size))
-    logging.info("Price: " + str(price))
-
 
 def getportion(CurrencyPair):
     allopenTrades = helper.sqlite.getSearchFilledBuysall()
