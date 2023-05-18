@@ -44,11 +44,11 @@ while True:
         print("Fehler bei get_balance in trading_signals.py: " + str(e))
         time.sleep(60)
 
-    # helper.trade.check_order() TODO
+    helper.trade.check_order()
 
     print()
 
-    # helper.trade.check_filled() TODO
+    helper.trade.check_filled()
 
     print()
 
