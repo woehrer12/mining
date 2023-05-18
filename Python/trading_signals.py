@@ -5,6 +5,7 @@ import datetime
 import logging
 
 import helper.binance
+import helper.predict
 import helper.sqlmanager
 # import helper.training
 import helper.config
@@ -22,6 +23,7 @@ logger = helper.functions.initlogger("trading_signals.log")
 conf = helper.config.initconfig()
 
 CurrencyPairList = ["BTCUSDT","ETHUSDT","BNBUSDT","PAXGUSDT"]
+CurrencyPairList = helper.predict.pairs()
 
 print("Trading Signals start")
 logging.info("Trading Signals start")
@@ -42,11 +44,11 @@ while True:
         print("Fehler bei get_balance in trading_signals.py: " + str(e))
         time.sleep(60)
 
-    # helper.trade.check_order() TODO
+    helper.trade.check_order()
 
     print()
 
-    # helper.trade.check_filled() TODO
+    helper.trade.check_filled()
 
     print()
 
@@ -54,6 +56,7 @@ while True:
     timer = datetime.datetime.now().minute
 
     if timer == 00:
+
         time.sleep(5)
 
         for CurrencyPair in CurrencyPairList:
@@ -64,27 +67,21 @@ while True:
 
             prepaired_data = helper.signals.prepair_data(data)
 
-            time_minus_45s = ((int(time.time())*1000) - 45000)
-
-            close_time = int(prepaired_data['Close time'].iloc[-2:-1])
-
             print("Preis:", str(float(prepaired_data['close'].iloc[-2:-1])))
 
-            if close_time > time_minus_45s:
-                print("Time Treffer")
+            # RSI BUY
+            data = strategies.main.handler(prepaired_data)
+            if data['enter_long'].iloc[-1] == 1:
+                print(data['strategy'])
 
-                # RSI BUY
-                data = strategies.main.handler(prepaired_data)
-                if data['enter_long'].iloc[-1] == 1:
-
-                    if helper.sqlmanager.get_trade_protectionBuys():
-                        logging.info("Buy Trade Time Protection " + CurrencyPair)
-                    # TODO Tradeprotection Sells
-                    elif helper.trade.getportion(CurrencyPair):
-                        logging.info("Buy Portion Protection " + CurrencyPair)
-                    else:
-                        print("BUY")
-                        # helper.trade.buy(CurrencyPair) # TODO
+                if helper.sqlmanager.get_trade_protectionBuys():
+                    logging.info("Buy Trade Time Protection " + CurrencyPair)
+                # TODO Tradeprotection Sells
+                elif helper.trade.getportion(CurrencyPair):
+                    logging.info("Buy Portion Protection " + CurrencyPair)
+                else:
+                    print("BUY")
+                    helper.trade.buy(CurrencyPair) # TODO
 
         time.sleep(60)
 
