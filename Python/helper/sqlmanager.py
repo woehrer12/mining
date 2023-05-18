@@ -78,6 +78,15 @@ def search_id(id):
     conn.close()
     return results
 
+def search_id(id):
+    #Search Trades there id is ??
+    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    conn = engine.connect()
+    query = db.select(Buys).where(Buys.c.trade_id == id)
+    results = conn.execute(query)
+    conn.close()
+    return results
+
 def search_new_buys():
     #Search Trades there status is New
     engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
