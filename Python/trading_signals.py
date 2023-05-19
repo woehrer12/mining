@@ -55,7 +55,8 @@ while True:
 
     timer = datetime.datetime.now().minute
 
-    if timer == 00:
+    #if timer == 00:
+    if True:
 
         time.sleep(5)
 
@@ -76,12 +77,12 @@ while True:
 
                 if helper.sqlmanager.get_trade_protectionBuys():
                     logging.info("Buy Trade Time Protection " + CurrencyPair)
-                # TODO Tradeprotection Sells
-                elif helper.trade.getportion(CurrencyPair):
-                    logging.info("Buy Portion Protection " + CurrencyPair)
+                if helper.sqlmanager.get_trade_protectionSells():
+                    logging.info("Buy Trade Time Protection Sells " + CurrencyPair)
+                # TODO Portion
                 else:
                     print("BUY")
-                    helper.trade.buy(CurrencyPair) # TODO
+                    helper.trade.buy(CurrencyPair, float(conf['set_size']))
 
         time.sleep(60)
 

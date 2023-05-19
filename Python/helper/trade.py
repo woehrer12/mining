@@ -78,7 +78,7 @@ def sell(Id):
     result['status'] = 'NEW'
 
     # Insert into Databse
-    helper.sqlmanager.updateBuywithSellid(result['orderId'], trade.trade_id)
+    helper.sqlmanager.update_buys_Sell_id(result, trade.trade_id)
 
     # Logging
     logging.info("SELL")
@@ -92,7 +92,7 @@ def sell(Id):
 
 def check_order():
     try:
-        print()
+        print("Check order")
         trades = helper.sqlmanager.search_new_buys()
         for trade in trades:
             result = helper.binance.check_order(trade.symbol,trade.orderid)
@@ -107,7 +107,7 @@ def check_order():
                 trade_time = int(trade.transactTime)
                 if trade_time < time_cancel:
                     print("CANCEL")
-                    cancel_orderBuys(result)
+                    cancel_orderBuys(trade.trade_id, result)
                     logging.info("Cancel Buy")
                     logging.info(trade)
     except Exception as e:
@@ -116,24 +116,23 @@ def check_order():
         time.sleep(60)
 
     try:
-        trades = helper.sqlmanager.get_trade_protectionBuys()
+        trades = helper.sqlmanager.search_new_sells()
         for trade in trades:
+            print(trade.trade_id)
+            print(trade.symbol)
             result = helper.binance.check_order(trade.symbol,trade.orderid)
             if result['status'] == "FILLED":
-                helper.sqlmanager.updateSellTrade(result)
-                buytrade = helper.sqlite.getSearchorderId2(trade[13])
-                profit = float(((trade[5]/buytrade[5])*100)-100)
-                profit_USDT = float(result['cummulativeQuoteQty']) - buytrade[8]
-                helper.sqlite.insertProfit(trade[0], trade[13], trade[14], profit, profit_USDT)
+                helper.sqlmanager.update_buys_Sell_status(result['status'], trade.trade_id)
+                profit = float(((trade.price/result['price'])*100)-100)
+                profit_USDT = float(result['cummulativeQuoteQty']) - trade.executedQty
                 logging.info("Sell complete")
                 logging.info(trade)
-                logging.info(buytrade)
-                helper.telegramsend.send("SELL " + str(trade[0]) + " Price: " + str(trade[5]) + " Profit: " + str(round(profit,2)) + " USDT: " + str(round(profit_USDT,2)))
+                helper.telegramsend.send("SELL " + str(trade.symbol) + " Price: " + str(trade.price) + " Profit: " + str(round(profit,2)) + " USDT: " + str(round(profit_USDT,2)))
             else:
                 time_now = int(time.time())*1000
                 time_cancel = int(time_now - 3300000)
-                trade_time = int(trade[4])
-                print("Pair: " + str(trade[0]) + "  Price: " + str(trade[5]) + "  Menge: " + str(trade[6]) + "  Time: " + str(datetime.datetime.fromtimestamp(trade[4]/1000)))
+                trade_time = int(trade.transactTime)
+                print("Pair: " + str(trade.symbol) + "  Price: " + str(trade.price) + "  Menge: " + str(trade.executedQty) + "  Time: " + str(datetime.datetime.fromtimestamp(trade.transacttime/1000)))
                 if trade_time < time_cancel:
                     print("CANCEL")
                     logging.info("Cancel Sell")
@@ -150,27 +149,27 @@ def check_order():
 
 def check_filled():
     try:
+        print("Check filled")
         trades = helper.sqlmanager.search_filled_buys()
         price_dict = helper.binance.get_24h_ticker()
         arr = []
         arr_w = []
         arrUSDT = []
         for trade in trades:
-
             for dict in price_dict:
                 if dict['symbol'] == trade.symbol:
                     price = float(dict['lastPrice'])
             print("Preis: ",price)
 
-            arr = np.append(arr,trade[5])
-            arr_w = np.append(arr_w,trade[6])
-            arrUSDT = np.append(arrUSDT,trade[8])
-            profit = float(((price/trade[5])*100)-100)
+            arr = np.append(arr,trade.price)
+            arr_w = np.append(arr_w,trade.executedQty)
+            arrUSDT = np.append(arrUSDT,trade.executedQty)
+            profit = float(((price/trade.price)*100)-100)
 
-            if trade[16] == "Fast":
+            if trade.kind == "Fast":
                 trailingvalue = 1.0
                 trailingoffset = 2.0
-            elif trade[16] == "Middle":
+            elif trade.kind == "Middle":
                 trailingvalue = 2.5
                 trailingoffset = 5.0
             else:
@@ -178,32 +177,35 @@ def check_filled():
                 trailingoffset = 10.0
             
             if profit > trailingoffset:
-                if not trade[14]:
+                if not trade.trailingProfit:
                     trailing = profit - trailingvalue
-                    helper.sqlite.updateTrailingTrade(trade[1],trailing)
+                    helper.sqlmanager.update_trailing(trade.trade_id,trailing)
                 else: 
-                    if profit > trade[14] + trailingvalue:
+                    if profit > trade.trailingProfit + trailingvalue:
                         trailing = profit - trailingvalue
-                        helper.sqlite.updateTrailingTrade(trade[1],trailing)
-            if not(not trade[14]):
+                        helper.sqlmanager.update_trailing(trade.trade_id,trailing)
+            if not(not trade.trailingProfit):
                 if profit > 2.0:
-                    if profit < trade[14]:
+                    if profit < trade.trailingProfit:
                         Coins = float(helper.binance.get_balance_pair(trade[0])['free'])
-                        if helper.sqlite.gettradeprotection():
+                        if helper.sqlmanager.get_trade_protectionBuys():
                             logging.info("Sell Trade Time Protection")
                             logging.info(trade)
-                        elif trade[6] > Coins:
+                        if helper.sqlmanager.get_trade_protectionSells():
+                            logging.info("Sell Trade Time Protection Sell")
+                            logging.info(trade)
+                        elif trade.executedQty > Coins:
                             logging.info("Sell Trade Balance Protection")
                             logging.info(trade)
-                            helper.sqlite.updateTrailingTradetoNULL(trade[1])
+                            helper.sqlmanager.update_trailing_to_null(trade.trade_id,trailing)
                             logging.info("Set TradetoNULL")
                             logging.info(trade)
                             helper.telegramsend.send("Not Enought for Sell" + str(trade[0]) + " ID:" + str(trade[15]))
                         else:
                             print("SELL")
-                            sell2(trade[15])
+                            sell(trade.trade_id)
                 else:
-                    helper.sqlite.updateTrailingTradetoNULL(trade[1])
+                    helper.sqlmanager.update_trailing_to_null(trade.trade_id,trailing)
                     logging.info("Set TradetoNULL")
                     logging.info(trade)
                     helper.telegramsend.send("Reset Trailing while under 2%" + str(trade[0]) + " ID:" + str(trade[15]))
@@ -220,38 +222,22 @@ def check_filled():
         print("Fehler bei check_filled in trade.py: " + str(e))
         time.sleep(60)
 
-def cancel_orderBuys(data):
+def cancel_orderBuys(trade_id,data):
     try:
+        print(data)
         helper.binance.cancel_order(data['symbol'],data['orderId'])
-        helper.sqlite.deleteBuyTrade(data)
+        helper.sqlmanager.delete_buys(trade_id)
     except Exception as e:
-        logging.error("Fehler bei cancel_orderSells in trade.py: " + str(e))
-        print("Fehler bei cancel_orderSells in trade.py: " + str(e))
+        logging.error("Fehler bei cancel_order Buys in trade.py: " + str(e))
+        print("Fehler bei cancel_order Buys in trade.py: " + str(e))
         time.sleep(60)
 
 def cancel_orderSells(data, buyId):
+    print(data)
     try:
         helper.binance.cancel_order(data['symbol'],data['orderId'])
-        helper.sqlite.updateBuywithSellid(buyId, "")
-        helper.sqlite.deleteSellTrade(data)
+        helper.sqlmanager.update_delete_sell(buyId, "")
     except Exception as e:
         logging.error("Fehler bei cancel_orderSells in trade.py: " + str(e))
         print("Fehler bei cancel_orderSells in trade.py: " + str(e))
         time.sleep(60)
-
-def getportion(CurrencyPair):
-    allopenTrades = helper.sqlite.getSearchFilledBuysall()
-
-    USDT = 0.0
-    totalUSDT = 0.0
-    for Trade in allopenTrades:
-        Trade = list(Trade)
-        if Trade[0] == CurrencyPair:
-            USDT += Trade[8]
-        totalUSDT += Trade[8]
-
-    portion = USDT/ totalUSDT * 100.0
-    if portion > 40:
-        logging.info("Get Portion: " + str(portion) + " " + str(CurrencyPair) + " USDT: " + str(USDT) + " totalUSDT: " + str(totalUSDT))
-        return True
-    return False
