@@ -1,3 +1,23 @@
+<script>
+    $(document).ready(function() {
+        // Tabellen sortierbar machen
+        $("#trades").tablesorter({
+            theme: 'default',
+            widgets: ['zebra'],
+            headerTemplate: '{content}{icon}',
+            headers: { 
+                // Pfeilsymbole für die sortierten Spalten hinzufügen
+                0: { sorter: false },
+                1: { sorter: 'text' },
+                2: { sorter: 'text' },
+                3: { sorter: 'digit' },
+                4: { sorter: 'digit' },
+                5: { sorter: 'text' }
+            }
+        });
+    });
+</script>
+
 <?php
         // Datenbankverbindung herstellen
         $servername = '172.30.0.2';

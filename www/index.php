@@ -65,63 +65,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js"></script>
     <script>
-        $(document).ready(function() {
-            // Tabellen sortierbar machen
-            $("#buys").tablesorter({
-                theme: 'default',
-                widgets: ['zebra'],
-                headerTemplate: '{content}{icon}',
-                headers: { 
-                    // Pfeilsymbole für die sortierten Spalten hinzufügen
-                    0: { sorter: false },
-                    1: { sorter: 'text' },
-                    2: { sorter: 'text' },
-                    3: { sorter: 'digit' },
-                    4: { sorter: 'digit' },
-                    5: { sorter: 'text' }
-                }
-            });
-        });
-    </script>
-    <script>
-        $(document).ready(function() {
-            // Tabellen sortierbar machen
-            $("#trades").tablesorter({
-                theme: 'default',
-                widgets: ['zebra'],
-                headerTemplate: '{content}{icon}',
-                headers: { 
-                    // Pfeilsymbole für die sortierten Spalten hinzufügen
-                    0: { sorter: false },
-                    1: { sorter: 'text' },
-                    2: { sorter: 'text' },
-                    3: { sorter: 'digit' },
-                    4: { sorter: 'digit' },
-                    5: { sorter: 'text' }
-                }
-            });
-        });
-    </script>
-    <script>
-        $(document).ready(function() {
-            // Tabellen sortierbar machen
-            $("#sells").tablesorter({
-                theme: 'default',
-                widgets: ['zebra'],
-                headerTemplate: '{content}{icon}',
-                headers: { 
-                    // Pfeilsymbole für die sortierten Spalten hinzufügen
-                    0: { sorter: false },
-                    1: { sorter: 'text' },
-                    2: { sorter: 'text' },
-                    3: { sorter: 'digit' },
-                    4: { sorter: 'digit' },
-                    5: { sorter: 'text' }
-                }
-            });
-        });
-    </script>
-    <script>
         function aktualisiereUhrzeit() {
             var aktuelleZeit = new Date();
             var stunden = aktuelleZeit.getHours();
@@ -155,6 +98,7 @@
             aktualisiereUhrzeit();
             setInterval(reloadIncludes, 5000); // Reload included files every 5 seconds
         });
+
     </script>
 </head>
 <body>
@@ -162,15 +106,25 @@
     <p>Datum: <?php echo date('d.m.Y'); ?></p>
     <p>Uhrzeit: <span id="uhrzeit"></span></p>
 
-    <?php
-        include('buys.php');
-        include('trades.php');
-        include('sells.php');
-    ?>
+    <div id="buys-container">
+        <?php include('buys.php'); ?>
+    </div>
+
+    <div id="trades-container">
+        <?php include('trades.php'); ?>
+    </div>
+
+    <div id="sells-container">
+        <?php include('sells.php'); ?>
+    </div>
 
     <p>
         Weitere Informationen:
         <a href="info.php">Hier klicken</a>
     </p>
+
+    <script>
+        setInterval(reloadIncludes, 5000); #TODO reload funktioniert nicht
+    </script>
 </body>
 </html>
