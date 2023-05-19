@@ -146,6 +146,8 @@
         function reloadIncludes() {
             $("#includedContent").load("buys.php");
             $("#includedTrades").load("trades.php");
+            $("#includedSells").load("sells.php");
+
         }
 
         // After the document has loaded, initialize the functions
