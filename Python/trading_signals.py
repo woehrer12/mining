@@ -55,8 +55,7 @@ while True:
 
     timer = datetime.datetime.now().minute
 
-    #if timer == 00:
-    if True:
+    if timer == 00:
 
         time.sleep(5)
 

@@ -50,7 +50,8 @@ def buy(CurrencyPair, Size):
 def sell(Id):
     # Search the Orders in Database
     trade = helper.sqlmanager.search_id(Id)
-
+    for trade in trade:
+        trade = trade
     # Get the actual prices
     price = helper.binance.get_24h_ticker()
     for dict in price:
@@ -66,7 +67,7 @@ def sell(Id):
     price = '{0:.8f}'.format(price)
     print("Preis: " + str(price))
     
-    size = float(trade[7]) * (1.0-(profit/100.0*0.2))
+    size = float(trade.executedQty) * (1.0-(profit/100.0*0.2))
     size = round_step_size(size,stepsize)
     print("Menge: "+ str(size))
     print("Profit: " + str(round(profit,2)) + "%")
@@ -74,7 +75,7 @@ def sell(Id):
     logging.info("SELL: " + str(trade.symbol) + ", size: " + str(size) + ", price: " + str(price))
 
     # Set the Sell Request
-    result = helper.binance.limit_sell(trade[0], size, price)
+    result = helper.binance.limit_sell(trade.symbol, size, price)
 
     result['status'] = 'NEW'
 
@@ -119,12 +120,10 @@ def check_order():
     try:
         trades = helper.sqlmanager.search_new_sells()
         for trade in trades:
-            print(trade.trade_id)
-            print(trade.symbol)
             result = helper.binance.check_order(trade.symbol,trade.orderid)
             if result['status'] == "FILLED":
                 helper.sqlmanager.update_buys_Sell_status(result['status'], trade.trade_id)
-                profit = float(((trade.price/result['price'])*100)-100)
+                profit = float(((trade.price/float(result['price']))*100)-100)
                 profit_USDT = float(result['cummulativeQuoteQty']) - trade.executedQty
                 logging.info("Sell complete")
                 logging.info(trade)
@@ -157,6 +156,7 @@ def check_filled():
         arr_w = []
         arrUSDT = []
         for trade in trades:
+            print(trade)
             for dict in price_dict:
                 if dict['symbol'] == trade.symbol:
                     price = float(dict['lastPrice'])
@@ -177,18 +177,19 @@ def check_filled():
                 trailingvalue = 5.0
                 trailingoffset = 10.0
             
+
             if profit > trailingoffset:
-                if not trade.trailingProfit:
+                if trade.trailingProfit is None:
                     trailing = profit - trailingvalue
-                    helper.sqlmanager.update_trailing(trade.trade_id,trailing)
+                    helper.sqlmanager.update_trailing(trailing, trade.trade_id)
                 else: 
                     if profit > trade.trailingProfit + trailingvalue:
                         trailing = profit - trailingvalue
-                        helper.sqlmanager.update_trailing(trade.trade_id,trailing)
+                        helper.sqlmanager.update_trailing(trailing, trade.trade_id)
             if not(not trade.trailingProfit):
                 if profit > 2.0:
                     if profit < trade.trailingProfit:
-                        Coins = float(helper.binance.get_balance_pair(trade[0])['free'])
+                        Coins = float(helper.binance.get_balance_pair(trade.symbol)['free'])
                         if helper.sqlmanager.get_trade_protectionBuys():
                             logging.info("Sell Trade Time Protection")
                             logging.info(trade)

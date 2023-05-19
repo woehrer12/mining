@@ -33,7 +33,7 @@
         }
 
         // SQL-Abfrage ausführen
-        $sql = "SELECT * FROM Buys WHERE status = 'FILLED'";
+        $sql = "SELECT * FROM Buys WHERE status = 'FILLED' AND sellId IS NULL";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {

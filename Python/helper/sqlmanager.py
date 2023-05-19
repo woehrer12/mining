@@ -26,7 +26,7 @@ Buys = db.Table('Buys', metadata,
             db.Column('timeInForce', db.String(12)),
             db.Column('type', db.String(8)),
             db.Column('side', db.String(8)),
-            db.Column('sellID', db.Integer),
+            db.Column('sellId', db.BigInteger),
             db.Column('trailingProfit', db.Integer),
             db.Column('kind', db.String(8)),
             )
@@ -78,24 +78,6 @@ def search_id(id):
     conn.close()
     return results
 
-def search_id(id):
-    #Search Trades there id is ??
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
-    conn = engine.connect()
-    query = db.select(Buys).where(Buys.c.trade_id == id)
-    results = conn.execute(query)
-    conn.close()
-    return results
-
-def search_id(id):
-    #Search Trades there id is ??
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
-    conn = engine.connect()
-    query = db.select(Buys).where(Buys.c.trade_id == id)
-    results = conn.execute(query)
-    conn.close()
-    return results
-
 def search_new_buys():
     #Search Trades there status is New
     engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
@@ -118,7 +100,7 @@ def search_filled_buys():
     #Search Trades there status is Filled
     engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
-    query = db.select(Buys).where((Buys.c.status == 'Filled') & (Buys.c.sellID == ''))
+    query = db.select(Buys).where((Buys.c.status == 'FILLED') & (Buys.c.sellId == None))
     results = conn.execute(query)
     conn.close()
     return results
@@ -179,7 +161,7 @@ def update_buys_Sell_id(result, trade_id):
     conn = engine.connect()
     query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
                                                                     sellId = result['orderId'],
-                                                                    sell_tranacttime = result['transactTime'],
+                                                                    sell_transactTime = result['transactTime'],
                                                                     sell_status = 'NEW'
                                                                     )
     # Beginne eine Transaktion
@@ -198,10 +180,12 @@ def update_buys_Sell_id(result, trade_id):
         conn.close()
     
 def update_buys_Sell_status(status, trade_id):
+    print(status)
+    print(trade_id)
     engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
-                                                                    sellId = id,
+                                                                    sellId = trade_id,
                                                                     sell_status = status
                                                                     )
     # Beginne eine Transaktion

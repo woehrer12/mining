@@ -2,6 +2,7 @@ version : '3.7'
 
 services:
 
+# TODO
   # trading_signals:
   #   image: trading_signals
   #   container_name: trading_signals

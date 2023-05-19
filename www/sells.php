@@ -45,9 +45,14 @@
             echo "<tr>";
             echo "<th>ID</th>";
             echo "<th>Symbol</th>";
-            echo "<th>transactTime</th>";
+            echo "<th>transactTime</th>";            
             echo "<th>Price</th>";
+            echo "<th>Actual Price</th>";
+            echo "<th>Trailing</th>";
+            echo "<th>Percent</th>";
             echo "<th>Qty</th>";
+            echo "<th>USDT</th>";
+            echo "<th>Profitloss</th>";
             echo "<th>Kind</th>";
             echo "</tr>";
             echo "</thead>";
@@ -69,7 +74,12 @@
                 echo "<td>" . $row["symbol"] . "</td>";
                 echo "<td>" . $convertedDate . "</td>";
                 echo "<td>" . $row["price"] . "</td>";
+                echo "<td>" . $priceFormatted . "</td>";
+                echo "<td>". $row["trailingProfit"]. "</td>";
+                echo "<td style='color: $color;'>" . round($percentageDifference, 2) . "% $arrow</td>";
                 echo "<td>" . $row["origQty"] . "</td>";
+                echo "<td>". $row["cummulativeQuoteQty"]. "</td>";
+                echo "<td>" . $profitLossrounded . "</td>";
                 echo "<td>" . $row["kind"] . "</td>";
                 echo "</tr>";
             }
