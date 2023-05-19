@@ -18,6 +18,7 @@ kinds = ["Slow", "Middle"]#, "Fast"]
 
 def buy(CurrencyPair, Size):
     USDT = float(helper.binance.get_balance()['free'])
+    print("USDT: " + USDT)
     for kind in kinds:
         if float(USDT) > (Size * 1.01) + float(conf['reserve']) :
             print(kind)
