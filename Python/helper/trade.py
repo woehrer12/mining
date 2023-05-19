@@ -16,12 +16,11 @@ helper.sqlmanager.init()
 
 kinds = ["Slow", "Middle"]#, "Fast"]
 
-def buy(CurrencyPair, Size):
+def buy(CurrencyPair, set_size):
     USDT = float(helper.binance.get_balance()['free'])
-    print("USDT: " + USDT)
+    print("USDT: " + str(USDT))
     for kind in kinds:
-        if float(USDT) > (Size * 1.01) + float(conf['reserve']) :
-            print(kind)
+        if USDT > (set_size * 1.01) + float(conf['reserve']) :
             price = helper.binance.get_24h_ticker()
             for dict in price:
                 if dict['symbol'] == CurrencyPair:
@@ -30,7 +29,7 @@ def buy(CurrencyPair, Size):
             ticksize = helper.binance.get_symbol_info(CurrencyPair)['filters'][0]['tickSize']
             stepsize = helper.binance.get_symbol_info(CurrencyPair)['filters'][1]['stepSize'] # TODO Change to 1 Request
 
-            Size = round(1/float(price)*Size,8)
+            Size = round(1/float(price)*set_size,8)
             price = round_step_size(float(price),ticksize)
             price = '{0:.8f}'.format(price)
             print("Preis: " + str(price))
@@ -41,7 +40,7 @@ def buy(CurrencyPair, Size):
             result = helper.binance.limit_buy(CurrencyPair, Size, price, 0)
             result['status'] = 'NEW'
             helper.sqlmanager.insert_buy(result,kind)
-            USDT = USDT - Size * 1.01
+            USDT = USDT - set_size * 1.01
             logging.info("Buy ")
             logging.info(result)
         else:
