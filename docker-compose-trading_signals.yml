@@ -2,18 +2,27 @@ version : '3.7'
 
 services:
 
-  trading_signals:
-    image: trading_signals
-    container_name: trading_signals
-    restart: always
-    volumes:
-    - ./:/mining/
+  # trading_signals:
+  #   image: trading_signals
+  #   container_name: trading_signals
+  #   restart: always
+  #   volumes:
+  #   - ./:/mining/
 
-  flask:
-    image: flask
-    container_name: flask
-    restart: always
+  # flask:
+  #   image: flask
+  #   container_name: flask
+  #   restart: always
+  #   ports:
+  #     - 5001:5001
+  #   volumes:
+  #   - ./:/mining/
+
+  apache:
+    image: ownphp
+    container_name: php
     ports:
-      - 5001:5001
+      - 80:80
     volumes:
-    - ./:/mining/
+      - ./www:/var/www/html
+
