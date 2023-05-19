@@ -12,10 +12,11 @@ metadata = db.MetaData()
 Buys = db.Table('Buys', metadata,
             db.Column('trade_id', db.Integer(),primary_key = True),
             db.Column('symbol', db.String(8), nullable = False),
-            db.Column('orderid', db.String(12)),
+            db.Column('orderid', db.BigInteger),
             db.Column('orderListId', db.Integer),
             db.Column('clientOrderId', db.String(24)),
             db.Column('transactTime', db.BigInteger),
+            db.Column('sell_transactTime', db.BigInteger),
             db.Column('price', db.Float),
             db.Column('origQty', db.Float),
             db.Column('executedQty', db.Float),
@@ -53,9 +54,20 @@ def insert_buy(data, kind):
                                    kind = kind
                                    )
 
-    result = conn.execute(query)
-    print(result)
-    conn.close()
+    # Beginne eine Transaktion
+    trans = conn.begin()
+
+    try:
+        conn.execute(query)
+
+        # Bestätige die Transaktion
+        trans.commit()
+    except:
+        # Bei einem Fehler mache einen Rollback der Transaktion
+        trans.rollback()
+        raise
+    finally:
+        conn.close()
 
 def search_id(id):
     #Search Trades there id is ??
@@ -71,6 +83,15 @@ def search_new_buys():
     engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.select(Buys).where(Buys.c.status == 'NEW')
+    results = conn.execute(query)
+    conn.close()
+    return results
+
+def search_new_sells():
+    #Search Trades there status is New
+    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    conn = engine.connect()
+    query = db.select(Buys).where(Buys.c.sell_status == 'NEW')
     results = conn.execute(query)
     conn.close()
     return results
@@ -91,7 +112,20 @@ def get_trade_protectionBuys():
     query = db.select(Buys).where(Buys.c.transactTime > protectiontime)
     results = conn.execute(query)
     conn.close()
-    return results # TODO testing this
+    if results.rowcount > 0:
+        return True
+    return False
+
+def get_trade_protectionSells():
+    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    conn = engine.connect()
+    protectiontime = (int(time.time()) - 3300)*1000
+    query = db.select(Buys).where(Buys.c.sell_transactTime > protectiontime)
+    results = conn.execute(query)
+    conn.close()
+    if results.rowcount > 0:
+        return True
+    return False
 
 def update_buys(data, trade_id):
     engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
@@ -122,11 +156,12 @@ def update_buys(data, trade_id):
     finally:
         conn.close()
     
-def update_buys_Sell_id(id, trade_id):
+def update_buys_Sell_id(result, trade_id):
     engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
-                                                                    sellId = id,
+                                                                    sellId = result['orderId'],
+                                                                    sell_tranacttime = result['transactTime'],
                                                                     sell_status = 'NEW'
                                                                     )
     # Beginne eine Transaktion
@@ -144,3 +179,108 @@ def update_buys_Sell_id(id, trade_id):
     finally:
         conn.close()
     
+def update_buys_Sell_status(status, trade_id):
+    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    conn = engine.connect()
+    query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
+                                                                    sellId = id,
+                                                                    sell_status = status
+                                                                    )
+    # Beginne eine Transaktion
+    trans = conn.begin()
+
+    try:
+        conn.execute(query)
+
+        # Bestätige die Transaktion
+        trans.commit()
+    except:
+        # Bei einem Fehler mache einen Rollback der Transaktion
+        trans.rollback()
+        raise
+    finally:
+        conn.close()
+
+def update_trailing(trailing, trade_id):
+    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    conn = engine.connect()
+    query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
+                                                                    trailingProfit = trailing,
+                                                                    )
+    # Beginne eine Transaktion
+    trans = conn.begin()
+
+    try:
+        conn.execute(query)
+
+        # Bestätige die Transaktion
+        trans.commit()
+    except:
+        # Bei einem Fehler mache einen Rollback der Transaktion
+        trans.rollback()
+        raise
+    finally:
+        conn.close()
+
+def update_trailing_to_null(trailing, trade_id):
+    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    conn = engine.connect()
+    query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
+                                                                    trailingProfit = None,
+                                                                    )
+    # Beginne eine Transaktion
+    trans = conn.begin()
+
+    try:
+        conn.execute(query)
+
+        # Bestätige die Transaktion
+        trans.commit()
+    except:
+        # Bei einem Fehler mache einen Rollback der Transaktion
+        trans.rollback()
+        raise
+    finally:
+        conn.close()
+
+def update_delete_sell(trade_id):
+    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    conn = engine.connect()
+    query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
+                                                                    sellId = None,
+                                                                    sell_status = None
+                                                                    )
+    # Beginne eine Transaktion
+    trans = conn.begin()
+
+    try:
+        conn.execute(query)
+
+        # Bestätige die Transaktion
+        trans.commit()
+    except:
+        # Bei einem Fehler mache einen Rollback der Transaktion
+        trans.rollback()
+        raise
+    finally:
+        conn.close()
+
+def delete_buys(trade_id):
+    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    conn = engine.connect()
+    query = db.delete(Buys).where(Buys.c.trade_id == trade_id)
+
+    # Beginne eine Transaktion
+    trans = conn.begin()
+
+    try:
+        conn.execute(query)
+
+        # Bestätige die Transaktion
+        trans.commit()
+    except:
+        # Bei einem Fehler mache einen Rollback der Transaktion
+        trans.rollback()
+        raise
+    finally:
+        conn.close()

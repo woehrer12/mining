@@ -31,34 +31,6 @@ def Sort(sub_li):
 def index():
     binanceprice = helper.binance.get_24h_ticker()
     USDT = float(helper.binance.get_balance()['free'])
-
-    allopenBuys = helper.sqlmanager.search_new_buys()
-    allBuys2 = []
-    for Buy in allopenBuys:
-        Buy=list(Buy)
-        Buy[4] = datetime.datetime.fromtimestamp(Buy[4]/1000).strftime("%d.%m.%Y %H:%M:%S")
-        allBuys2.append(Buy)
-        totalUSDT += Buy[8]
-
-
-    allopenSells = helper.sqlite.getSearchNewSells()
-    allSells2 = []
-    for Sell in allopenSells:
-        Sell=list(Sell)
-        Sell[4] = datetime.datetime.fromtimestamp(Sell[4]/1000).strftime("%d.%m.%Y %H:%M:%S")
-        allSells2.append(Sell)
-        totalUSDT += Sell[8]
-
-
-    allopenTrades = helper.sqlite.getSearchFilledBuysall()
-    allTrades2 = []
- 
-    allTrades2 = Sort(allTrades2)
-
-    USDT = round(USDT,2)
-    totalprofitUSDT = round(totalprofitUSDT,2)
-    totalUSDT += totalprofitUSDT + USDT
-    totalUSDT = round(totalUSDT,2)
     
 
     return render_template('index.html',    allopenTrades=allTrades2, 
@@ -76,12 +48,12 @@ def index():
 @app.route('/trade')
 def trade():
     Id = request.args.get('Id')
-    Trade = helper.sqlite.getSearchorderId2(Id)
+    Trade = helper.sqlmanager.getSearchorderId2(Id)
     Trade = list(Trade)
-    Trade[4] = datetime.datetime.fromtimestamp(Trade[4]/1000).strftime("%d.%m.%Y %H:%M:%S")
+    Trade.transactTime = datetime.datetime.fromtimestamp(Trade.transactTime/1000).strftime("%d.%m.%Y %H:%M:%S")
     binanceprice = helper.binance.get_24h_ticker()
     for dict in binanceprice:
-        if dict['symbol'] == Trade[0]:
+        if dict['symbol'] == Trade.symbol:
             price = float(dict['lastPrice'])
     profit = float(((price/Trade[5])*100)-100)
     Trade.append(str(round(profit,2)))
