@@ -31,13 +31,56 @@
             padding: 8px;
             text-align: left;
         }
+
+        .headerSortUp:after,
+        .headerSortDown:after {
+            content: "";
+            float: right;
+            margin-top: 7px;
+            margin-left: 5px;
+            border-width: 0 4px 4px;
+            border-style: solid;
+            border-color: #ffffff transparent;
+            visibility: hidden;
+        }
+
+        .headerSortUp:after {
+            border-bottom-color: #ffffff;
+        }
+
+        .headerSortDown:after {
+            border-top-color: #ffffff;
+        }
+
+        .headerSortUp,
+        .headerSortDown {
+            padding-right: 20px;
+        }
+
+        .headerSortDown:hover:after,
+        .headerSortUp:hover:after {
+            visibility: visible;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js"></script>
     <script>
         $(document).ready(function() {
             // Tabellen sortierbar machen
-            $("#myTable").tablesorter();
+            $("#myTable").tablesorter({
+                theme: 'default',
+                widgets: ['zebra'],
+                headerTemplate: '{content}{icon}',
+                headers: { 
+                    // Pfeilsymbole für die sortierten Spalten hinzufügen
+                    0: { sorter: false },
+                    1: { sorter: 'text' },
+                    2: { sorter: 'text' },
+                    3: { sorter: 'digit' },
+                    4: { sorter: 'digit' },
+                    5: { sorter: 'text' }
+                }
+            });
         });
     </script>
 </head>
