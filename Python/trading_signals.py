@@ -5,15 +5,16 @@ import datetime
 import logging
 
 import helper.binance
+import helper.predict
 import helper.sqlmanager
 # import helper.training
 import helper.config
 import helper.functions
 # import helper.sqlite
-# import helper.signals
-# import helper.trade
+import helper.signals
+import helper.trade
 import helper.telegramsend
-# import strategies.main
+import strategies.main
 
 warnings.filterwarnings('ignore')
 
@@ -22,6 +23,7 @@ logger = helper.functions.initlogger("trading_signals.log")
 conf = helper.config.initconfig()
 
 CurrencyPairList = ["BTCUSDT","ETHUSDT","BNBUSDT","PAXGUSDT"]
+CurrencyPairList = helper.predict.pairs()
 
 print("Trading Signals start")
 logging.info("Trading Signals start")
@@ -54,46 +56,32 @@ while True:
     timer = datetime.datetime.now().minute
 
     if timer == 00:
+
         time.sleep(5)
 
         for CurrencyPair in CurrencyPairList:
             print()
             print(CurrencyPair)
 
-            data = helper.binance.get_klines(CurrencyPair)
+            data = helper.binance.get_klines_1h(CurrencyPair)
 
             prepaired_data = helper.signals.prepair_data(data)
 
-            time_minus_45s = ((int(time.time())*1000) - 45000)
-
-            close_time = int(prepaired_data['Close time'].iloc[-2:-1])
-
             print("Preis:", str(float(prepaired_data['close'].iloc[-2:-1])))
 
-            print("RSI 6: " + str(round(float(prepaired_data['rsi_6'].iloc[-2:-1]),2)))
-            print("RSI 12: " + str(round(float(prepaired_data['rsi_12'].iloc[-2:-1]),2)))
-            print("RSI 24: " + str(round(float(prepaired_data['rsi_24'].iloc[-2:-1]),2)))
-            print("RSI 200: " + str(round(float(prepaired_data['rsi_200'].iloc[-2:-1]),2)))
+            # RSI BUY
+            data = strategies.main.handler(prepaired_data)
+            if data['enter_long'].iloc[-1] == 1:
+                print(data['strategy'])
 
-            print()
-
-            print("SMA 6: " + str(round(float(prepaired_data['sma_6'].iloc[-2:-1]),2)))
-            print("SMA 12: " + str(round(float(prepaired_data['sma_12'].iloc[-2:-1]),2)))
-            print("SMA 24: " + str(round(float(prepaired_data['sma_24'].iloc[-2:-1]),2)))
-            print("SMA 200: " + str(round(float(prepaired_data['sma_200'].iloc[-2:-1]),2)))
-
-            if close_time > time_minus_45s:
-                print("Time Treffer")
-
-                # RSI BUY
-                if strategies.main.handler(prepaired_data):
-                    if helper.sqlite.gettradeprotection():
-                        logging.info("Buy Trade Time Protection " + CurrencyPair)
-                    elif helper.trade.getportion(CurrencyPair):
-                        logging.info("Buy Portion Protection " + CurrencyPair)
-                    else:
-                        print("BUY")
-                        helper.trade.buy(CurrencyPair) # TODO
+                if helper.sqlmanager.get_trade_protectionBuys():
+                    logging.info("Buy Trade Time Protection " + CurrencyPair)
+                if helper.sqlmanager.get_trade_protectionSells():
+                    logging.info("Buy Trade Time Protection Sells " + CurrencyPair)
+                # TODO Portion
+                else:
+                    print("BUY")
+                    helper.trade.buy(CurrencyPair, float(conf['set_size']))
 
         time.sleep(60)
 

@@ -1,2 +1,5 @@
 sqlalchemy
 mysql-connector-python
+python-binance
+python-telegram-bot
+numpy

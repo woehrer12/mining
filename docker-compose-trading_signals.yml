@@ -2,12 +2,12 @@ version : '3.7'
 
 services:
 
-  # trading_signals:
-  #   image: trading_signals
-  #   container_name: trading_signals
-  #   restart: always
-  #   volumes:
-  #   - ./:/mining/
+  trading_signals:
+    image: trading_signals
+    container_name: trading_signals
+    restart: always
+    volumes:
+    - ./:/mining/
 
   # flask:
   #   image: flask
