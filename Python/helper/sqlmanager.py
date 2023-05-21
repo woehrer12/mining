@@ -1,5 +1,6 @@
 import sqlalchemy as db
 import time
+import logging
 
 import helper.config
 
@@ -62,7 +63,9 @@ def insert_buy(data, kind):
 
         # Bestätige die Transaktion
         trans.commit()
-    except:
+    except Exception as e:
+        logging.error("Fehler bei insert buy in sqlmanager.py: " + str(e))
+        print("Fehler bei insert buy in sqlmanager.py: " + str(e))
         # Bei einem Fehler mache einen Rollback der Transaktion
         trans.rollback()
         raise
@@ -149,7 +152,9 @@ def update_buys(data, trade_id):
 
         # Bestätige die Transaktion
         trans.commit()
-    except:
+    except Exception as e:
+        logging.error("Fehler bei update buys in sqlmanager.py: " + str(e))
+        print("Fehler bei update buys in sqlmanager.py: " + str(e))
         # Bei einem Fehler mache einen Rollback der Transaktion
         trans.rollback()
         raise
@@ -172,7 +177,9 @@ def update_buys_Sell_id(result, trade_id):
 
         # Bestätige die Transaktion
         trans.commit()
-    except:
+    except Exception as e:
+        logging.error("Fehler bei update buy sell id in sqlmanager.py: " + str(e))
+        print("Fehler bei update buy sell id in sqlmanager.py: " + str(e))
         # Bei einem Fehler mache einen Rollback der Transaktion
         trans.rollback()
         raise
@@ -196,7 +203,9 @@ def update_buys_Sell_status(status, trade_id):
 
         # Bestätige die Transaktion
         trans.commit()
-    except:
+    except Exception as e:
+        logging.error("Fehler bei update buy sell status in sqlmanager.py: " + str(e))
+        print("Fehler bei update buy sell status in sqlmanager.py: " + str(e))
         # Bei einem Fehler mache einen Rollback der Transaktion
         trans.rollback()
         raise
@@ -217,7 +226,9 @@ def update_trailing(trailing, trade_id):
 
         # Bestätige die Transaktion
         trans.commit()
-    except:
+    except Exception as e:
+        logging.error("Fehler bei update trailing in sqlmanager.py: " + str(e))
+        print("Fehler bei update trailing in sqlmanager.py: " + str(e))
         # Bei einem Fehler mache einen Rollback der Transaktion
         trans.rollback()
         raise
@@ -238,7 +249,9 @@ def update_trailing_to_null(trailing, trade_id):
 
         # Bestätige die Transaktion
         trans.commit()
-    except:
+    except Exception as e:
+        logging.error("Fehler bei update trailing to null in sqlmanager.py: " + str(e))
+        print("Fehler bei update trailing to null in sqlmanager.py: " + str(e))
         # Bei einem Fehler mache einen Rollback der Transaktion
         trans.rollback()
         raise
@@ -260,7 +273,9 @@ def update_delete_sell(trade_id):
 
         # Bestätige die Transaktion
         trans.commit()
-    except:
+    except Exception as e:
+        logging.error("Fehler bei update delete sell in sqlmanager.py: " + str(e))
+        print("Fehler bei update delete sell in sqlmanager.py: " + str(e))
         # Bei einem Fehler mache einen Rollback der Transaktion
         trans.rollback()
         raise
@@ -280,7 +295,9 @@ def delete_buys(trade_id):
 
         # Bestätige die Transaktion
         trans.commit()
-    except:
+    except Exception as e:
+        logging.error("Fehler bei delete buy in sqlmanager.py: " + str(e))
+        print("Fehler bei delete buy in sqlmanager.py: " + str(e))
         # Bei einem Fehler mache einen Rollback der Transaktion
         trans.rollback()
         raise
