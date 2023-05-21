@@ -30,7 +30,7 @@ def RSI(data):
         (float(data['rsi_200'].iloc[-2:-1]) < file['RSI_enter']['4'] and
         float(data['sma_200'].iloc[-2:-1]) > float(data['close'].iloc[-2:-1])):
             data['enter_long'].iloc[-1] = 1
-            data['strategy'] = data['strategy'] + 'RSI'
+            data['strategy'] = data['strategy'] + 'RSI '
     
     if (float(data['rsi_6'].iloc[-2:-1]) > file['RSI_exit']['1'] and
         float(data['sma_6'].iloc[-2:-1]) < float(data['close'].iloc[-2:-1])) or \
@@ -41,7 +41,7 @@ def RSI(data):
         (float(data['rsi_200'].iloc[-2:-1]) > file['RSI_exit']['4'] and
         float(data['sma_200'].iloc[-2:-1]) < float(data['close'].iloc[-2:-1])):
             data['exit_long'].iloc[-1] = 1
-            data['strategy'] = data['strategy'] + 'RSI'
+            data['strategy'] = data['strategy'] + 'RSI '
 
     return data
 
@@ -53,11 +53,11 @@ def ClucMay72018(data):
         (float(data['close'].iloc[-2:-1]) < 0.985 * float(data['bb_lowerband'].iloc[-2:-1])) & \
         (float(data['volume'].iloc[-2:-1]) < (float(data['volume'].rolling(window=30).mean().shift(1).iloc[-2:-1]) * 20.0)):
             data['enter_long'].iloc[-1] = 1
-            data['strategy'] = data['strategy'] + 'ClucMay72018'
+            data['strategy'] = data['strategy'] + 'ClucMay72018 '
 
 
     if (float(data['close'].iloc[-2:-1]) > (float(data['bb_middleband'].iloc[-2:-1]))*1.2):
             data['exit_long'].iloc[-1] = 1
-            data['strategy'] = data['strategy'] + 'ClucMay72018'
+            data['strategy'] = data['strategy'] + 'ClucMay72018 '
 
     return data

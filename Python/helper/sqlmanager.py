@@ -11,7 +11,7 @@ metadata = db.MetaData()
 
 Buys = db.Table('Buys', metadata,
             db.Column('trade_id', db.Integer(),primary_key = True),
-            db.Column('symbol', db.String(8), nullable = False),
+            db.Column('symbol', db.String(10), nullable = False),
             db.Column('orderid', db.BigInteger),
             db.Column('orderListId', db.Integer),
             db.Column('clientOrderId', db.String(24)),
