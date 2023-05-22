@@ -118,10 +118,9 @@
         <?php include('sells.php'); ?>
     </div>
 
-    <p>
-        Weitere Informationen:
-        <a href="info.php">Hier klicken</a>
-    </p>
+    <div id="navbar-container">
+        <?php include('navbar.php'); ?>
+    </div>
 
     <script>
         setInterval(reloadIncludes, 5000); #TODO reload funktioniert nicht
