@@ -9,14 +9,14 @@ services:
     volumes:
     - ./:/mining/
 
-  # flask:
-  #   image: flask
-  #   container_name: flask
-  #   restart: always
-  #   ports:
-  #     - 5001:5001
-  #   volumes:
-  #   - ./:/mining/
+  flask:
+    image: flask
+    container_name: flask
+    restart: always
+    ports:
+      - 5001:5001
+    volumes:
+    - ./:/mining/
 
   apache:
     image: ownphp

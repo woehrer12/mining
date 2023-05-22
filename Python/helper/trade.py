@@ -210,14 +210,7 @@ def check_filled():
                     logging.info("Set TradetoNULL")
                     logging.info(trade)
                     helper.telegramsend.send("Reset Trailing while under 2%" + str(trade[0]) + " ID:" + str(trade[15]))
-        if len(arr) >0:
-            gewichteter_durchschnitt = np.average(arr,weights = arr_w)
-            profit = float(((price/gewichteter_durchschnitt)*100)-100)
-            print("Gewichteter Durchschnitt : ", round(gewichteter_durchschnitt,2))
-            print("Summe: ", np.sum(arr_w))
-            print("Summe: ", round(np.sum(arrUSDT),2), "USDT")
-            print("Durschnittlicher Gewinn: " + str(round(profit,2)) + "%")
-            print()
+
     except Exception as e:
         logging.error("Fehler bei check_filled in trade.py: " + str(e))
         print("Fehler bei check_filled in trade.py: " + str(e))
