@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Neuer Eintrag</title>
-    <style>
+    <title>Buy Form</title>
+</head>
+<style>
         body {
             background-color: #1c1c1e;
             color: #ffffff;
@@ -62,23 +63,17 @@
             visibility: visible;
         }
     </style>
-</head>
 <body>
-    <h1>Neuer Eintrag</h1>
-    <form method="post" action="insert.php">
-        <label for="symbol">Symbol:</label>
-        <input type="text" name="symbol" id="symbol" required><br><br>
-        
-        <label for="price">Preis:</label>
-        <input type="number" step="0.000000001" name="price" id="price" required><br><br>
-        
-        <label for="qty">Menge:</label>
-        <input type="number" step="0.00001" name="qty" id="qty" required><br><br>
-        
-        <label for="qty">USDT:</label>
-        <input type="number" step="0.01" name="usdt" id="usdt" required><br><br>
+    <h1>Buy Form</h1>
 
-        <input type="submit" value="Eintrag hinzufügen">
+    <form action="http://localhost:5001/buy" method="GET">
+        <label for="pair">Pair:</label>
+        <input type="text" name="Pair" id="pair" required><br>
+
+        <label for="size">Size:</label>
+        <input type="number" name="Size" id="size" required><br>
+
+        <input type="submit" value="Buy">
     </form>
 </body>
 </html>
