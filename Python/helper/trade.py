@@ -119,14 +119,15 @@ def check_order():
     try:
         trades = helper.sqlmanager.search_new_sells()
         for trade in trades:
-            result = helper.binance.check_order(trade.symbol,trade.orderid)
+            result = helper.binance.check_order(trade.symbol,trade.sellId)
             if result['status'] == "FILLED":
                 helper.sqlmanager.update_buys_Sell_status(result['status'], trade.trade_id)
                 profit = float(((trade.price/float(result['price']))*100)-100)
-                profit_USDT = float(result['cummulativeQuoteQty']) - trade.executedQty
+                profit_USDT = float(result['cummulativeQuoteQty']) - trade.cummulativeQuoteQty
                 logging.info("Sell complete")
                 logging.info(trade)
-                helper.telegramsend.send("SELL " + str(trade.symbol) + " Price: " + str(trade.price) + " Profit: " + str(round(profit,2)) + " USDT: " + str(round(profit_USDT,2)))
+                logging.info(result)
+                helper.telegramsend.send("SELL " + str(trade.symbol) + " Price: " + str(result['price']) + " Profit: " + str(round(profit,2)) + " USDT: " + str(round(profit_USDT,2)))
             else:
                 time_now = int(time.time())*1000
                 time_cancel = int(time_now - 3300000)
