@@ -20,11 +20,10 @@
 
 <?php
 
-        $ini = parse_ini_file('/mining/config/conig.ini');
+        $ini = parse_ini_file('/mining/config/config.ini');
 
         // Datenbankverbindung herstellen
-        // $servername = $ini['MYSQL_HOST'];
-        $servername = '172.30.0.2';
+        $servername = $ini['MYSQL_HOST'];
         $username = 'root';
         $password = 'root';
         $database = 'sqlalchemy';

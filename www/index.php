@@ -110,13 +110,13 @@
         <?php include('buys.php'); ?>
     </div>
 
-    <div id="trades-container">
+    <!-- <div id="trades-container">
         <?php include('trades.php'); ?>
     </div>
 
     <div id="sells-container">
         <?php include('sells.php'); ?>
-    </div>
+    </div> -->
 
     <div id="navbar-container">
         <?php include('navbar.php'); ?>
