@@ -61,6 +61,9 @@
             // Datensätze ausgeben
             while ($row = $result->fetch_assoc()) {
 
+                // Generate the sell link with the trade ID as a parameter
+                $sellLink = "http://localhost:5001/sell?Id=" . $row["trade_id"];
+
                 // Binance API endpoint
                 $endpoint = "https://api.binance.com/api/v3/ticker/price";
 
@@ -146,6 +149,7 @@
                 echo "<td>". $row["cummulativeQuoteQty"]. "</td>";
                 echo "<td>" . $profitLossrounded . "</td>";
                 echo "<td>" . $row["kind"] . "</td>";
+                echo "<td><a href=\"$sellLink\">Sell</a></td>";
                 echo "</tr>";
             }
 

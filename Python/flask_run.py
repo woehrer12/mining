@@ -41,7 +41,7 @@ def index():
 @app.route('/sell')
 def sell():
     Id = request.args.get('Id')
-    helper.trade.sell2(Id)
+    helper.trade.sell(Id)
     return "<h1>SELL {}".format(Id)
 
 @app.route('/buy')
