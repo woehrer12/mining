@@ -19,7 +19,11 @@
 </script>
 
 <?php
+
+        $ini = parse_ini_file('/mining/config/conig.ini');
+
         // Datenbankverbindung herstellen
+        // $servername = $ini['MYSQL_HOST'];
         $servername = '172.30.0.2';
         $username = 'root';
         $password = 'root';
