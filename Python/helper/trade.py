@@ -207,7 +207,7 @@ def check_filled():
                             print("SELL")
                             sell(trade.trade_id)
                 else:
-                    helper.sqlmanager.update_trailing_to_null(trade.trade_id,trailing)
+                    helper.sqlmanager.update_trailing_to_null(trade.trade_id)
                     logging.info("Set TradetoNULL")
                     logging.info(trade)
                     helper.telegramsend.send("Reset Trailing while under 2%" + str(trade[0]) + " ID:" + str(trade[15]))

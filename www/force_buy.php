@@ -66,7 +66,7 @@
 <body>
     <h1>Buy Form</h1>
 
-    <form action="http://localhost:5001/buy" method="GET">
+    <form action=":5001/buy" method="GET">
         <label for="pair">Pair:</label>
         <input type="text" name="Pair" id="pair" required><br>
 

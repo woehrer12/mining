@@ -12,6 +12,8 @@ services:
     volumes:
       - ./mysql:/var/lib/mysql
     restart: always
+    networks:
+      - mynetwork
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -25,6 +27,8 @@ services:
       PMA_PASSWORD: root
     ports:
       - 8183:80
+    networks:
+      - mynetwork
 
   miningapi:
     depends_on:
@@ -36,6 +40,8 @@ services:
       - 5000:5000
     volumes:
     - ./:/mining/
+    networks:
+      - mynetwork
 
   grafana:
     depends_on:
@@ -50,13 +56,19 @@ services:
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
     restart: always
+    networks:
+      - mynetwork
 
-  hiveos:
-    image: hiveos
-    container_name: hiveos
-    restart: always
-    volumes:
-    - ./:/mining/
+
+  # hiveos:
+  #   image: hiveos
+  #   container_name: hiveos
+  #   restart: always
+  #   volumes:
+  #   - ./:/mining/
 
 volumes:
   grafana:
+
+networks:
+  mynetwork:
