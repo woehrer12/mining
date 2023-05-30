@@ -60,48 +60,54 @@
             echo "</thead>";
             echo "<tbody>";
 
+            // Binance API endpoint
+            $endpoint = "https://api.binance.com/api/v3/ticker/price";
+
+            // Create URL with symbol as a query parameter
+            $url = $endpoint;
+
+            // Initialize cURL session
+            $ch = curl_init();
+
+            // Set cURL options
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+            // Execute the API request
+            $response = curl_exec($ch);
+
+            // Close cURL session
+            curl_close($ch);
+
+            // Process the response
+
+            $tickerData = json_decode($response, true);
+
+            // Create an associative array to store the prices for each symbol
+            $prices = array();
+            foreach ($tickerData as $ticker) {
+                $symbol = $ticker['symbol'];
+                $price = $ticker['price'];
+                $prices[$symbol] = $price;
+                $priceFormatted = rtrim($price, '0');
+            }
+
             // Datensätze ausgeben
             while ($row = $result->fetch_assoc()) {
 
+                $symbol = $row["symbol"];
+                $price = $prices[$symbol];
+                $priceFormatted = rtrim($price, '0');
+
+
+                // if (isset($tickerData['symbol']) && isset($tickerData['price'])) {
+                //     $symbol = $tickerData['symbol'];
+                //     $price = $tickerData['price'];
+                //     $priceFormatted = rtrim($price, '0');
+                // }
+
                 // Generate the sell link with the trade ID as a parameter
-                $sellLink = ":5001/sell?Id=" . $row["trade_id"];
-
-                // Binance API endpoint
-                $endpoint = "https://api.binance.com/api/v3/ticker/price";
-
-                // Create URL with symbol as a query parameter
-                $url = $endpoint . "?symbol=" . $row["symbol"];
-
-                // Initialize cURL session
-                $ch = curl_init();
-
-                // Set cURL options
-                curl_setopt($ch, CURLOPT_URL, $url);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-                // Execute the API request
-                $response = curl_exec($ch);
-
-                // Close cURL session
-                curl_close($ch);
-
-                // Process the response
-                if ($response !== false) {
-                    $tickerData = json_decode($response, true);
-
-                    // Check if the response contains valid data
-                    if (isset($tickerData['symbol']) && isset($tickerData['price'])) {
-                        $symbol = $tickerData['symbol'];
-                        $price = $tickerData['price'];
-                        $priceFormatted = rtrim($price, '0');
-
-                    } else {
-                        echo "Invalid response from the API\n";
-                    }
-                } else {
-                    echo "Failed to make the API request\n";
-                }
-                
+                $sellLink = ":5001/sell?Id=" . $row["trade_id"];                
 
                 // Convert the values to numeric format
                 $currentPrice = floatval($price);

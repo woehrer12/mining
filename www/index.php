@@ -106,6 +106,10 @@
     <p>Datum: <?php echo date('d.m.Y'); ?></p>
     <p>Uhrzeit: <span id="uhrzeit"></span></p>
 
+    <div id="overview">
+        <?php include('overview.php'); ?>
+    </div>
+
     <div id="buys-container">
         <?php include('buys.php'); ?>
     </div>

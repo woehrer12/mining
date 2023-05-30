@@ -23,7 +23,7 @@ $kind = "Slow";
 $USDT = $_POST['usdt'];
 
 // SQL-Abfrage zum Einfügen des neuen Eintrags
-$sql = "INSERT INTO Buys (symbol, price, origQty, transactTime, status, kind, cummulativeQuoteQty) VALUES ('$symbol', '$price', '$qty', '$transactTime', '$status', '$kind', '$USDT')";
+$sql = "INSERT INTO Buys (symbol, price, origQty, executedQty, transactTime, status, kind, cummulativeQuoteQty) VALUES ('$symbol', '$price', '$qty', '$qty', '$transactTime', '$status', '$kind', '$USDT')";
 
 if ($conn->query($sql) === TRUE) {
     echo "Neuer Eintrag erfolgreich hinzugefügt.";

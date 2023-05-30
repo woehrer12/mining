@@ -23,7 +23,7 @@ logger = helper.functions.initlogger("trading_signals.log")
 conf = helper.config.initconfig()
 
 CurrencyPairList = ["BTCUSDT","ETHUSDT","BNBUSDT","PAXGUSDT"]
-CurrencyPairList = helper.predict.pairs()
+# CurrencyPairList = helper.predict.pairs()
 
 print("Trading Signals start")
 logging.info("Trading Signals start")

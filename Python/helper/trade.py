@@ -122,7 +122,7 @@ def check_order():
             result = helper.binance.check_order(trade.symbol,trade.sellId)
             if result['status'] == "FILLED":
                 helper.sqlmanager.update_buys_Sell_status(result['status'], trade.trade_id)
-                profit = float(((trade.price/float(result['price']))*100)-100)
+                profit = float(((float(result['price']/trade.price))*100)-100)
                 profit_USDT = float(result['cummulativeQuoteQty']) - trade.cummulativeQuoteQty
                 logging.info("Sell complete")
                 logging.info(trade)
