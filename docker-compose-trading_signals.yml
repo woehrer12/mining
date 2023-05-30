@@ -8,7 +8,8 @@ services:
     restart: always
     volumes:
     - ./:/mining/
-    network_mode: bridge
+    networks: 
+      - network1
 
   flask:
     image: flask
@@ -18,7 +19,8 @@ services:
       - 5001:5001
     volumes:
     - ./:/mining/
-    network_mode: bridge
+    networks: 
+      - network1
 
   apache:
     image: ownphp
@@ -28,5 +30,11 @@ services:
     volumes:
       - ./www:/var/www/html
       - ./:/mining/
-    network_mode: bridge
+    networks: 
+      - network1
 
+
+networks:
+  network1:
+    name: my-pre-existing-network
+    external: true

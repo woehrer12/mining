@@ -28,7 +28,7 @@ Buys = db.Table('Buys', metadata,
             db.Column('type', db.String(8)),
             db.Column('side', db.String(8)),
             db.Column('sellId', db.BigInteger),
-            db.Column('trailingProfit', db.Integer),
+            db.Column('trailingProfit', db.Float),
             db.Column('kind', db.String(8)),
             )
 
