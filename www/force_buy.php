@@ -66,7 +66,7 @@
 <body>
     <h1>Buy Form</h1>
 
-    <form action=":5001/buy" method="GET">
+    <form action="http://172.30.0.2:5001/buy" method="GET">
         <label for="pair">Pair:</label>
         <input type="text" name="Pair" id="pair" required><br>
 
