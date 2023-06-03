@@ -32,12 +32,15 @@ Buys = db.Table('Buys', metadata,
             db.Column('kind', db.String(8)),
             )
 
+engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+metadata.create_all(engine)
+
 def init():
     engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     metadata.create_all(engine)
 
 def insert_buy(data, kind):
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    # engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.insert(Buys).values(symbol = data['symbol'],
                                    orderid = data['orderId'],
@@ -74,7 +77,7 @@ def insert_buy(data, kind):
 
 def search_id(id):
     #Search Trades there id is ??
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    # engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.select(Buys).where(Buys.c.trade_id == id)
     results = conn.execute(query)
@@ -83,7 +86,7 @@ def search_id(id):
 
 def search_new_buys():
     #Search Trades there status is New
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    # engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.select(Buys).where(Buys.c.status == 'NEW')
     results = conn.execute(query)
@@ -92,7 +95,7 @@ def search_new_buys():
 
 def search_new_sells():
     #Search Trades there status is New
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    # engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.select(Buys).where(Buys.c.sell_status == 'NEW')
     results = conn.execute(query)
@@ -101,7 +104,7 @@ def search_new_sells():
 
 def search_filled_buys():
     #Search Trades there status is Filled
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    # engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.select(Buys).where((Buys.c.status == 'FILLED') & (Buys.c.sellId == None))
     results = conn.execute(query)
@@ -109,7 +112,7 @@ def search_filled_buys():
     return results
 
 def get_trade_protectionBuys():
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    # engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     protectiontime = (int(time.time()) - 3300)*1000
     query = db.select(Buys).where(Buys.c.transactTime > protectiontime)
@@ -120,7 +123,7 @@ def get_trade_protectionBuys():
     return False
 
 def get_trade_protectionSells():
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    # engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     protectiontime = (int(time.time()) - 3300)*1000
     query = db.select(Buys).where(Buys.c.sell_transactTime > protectiontime)
@@ -131,7 +134,7 @@ def get_trade_protectionSells():
     return False
 
 def update_buys(data, trade_id):
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    # engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
                                                                     transactTime = data['time'],
@@ -162,7 +165,7 @@ def update_buys(data, trade_id):
         conn.close()
     
 def update_buys_Sell_id(result, trade_id):
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    # engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
                                                                     sellId = result['orderId'],
@@ -213,7 +216,7 @@ def update_buys_Sell_status(status, trade_id):
         conn.close()
 
 def update_trailing(trailing, trade_id):
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    # engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
                                                                     trailingProfit = trailing,
@@ -236,7 +239,7 @@ def update_trailing(trailing, trade_id):
         conn.close()
 
 def update_trailing_to_null(trailing, trade_id):
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    # engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
                                                                     trailingProfit = None,
@@ -259,7 +262,7 @@ def update_trailing_to_null(trailing, trade_id):
         conn.close()
 
 def update_delete_sell(trade_id):
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    # engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
                                                                     sellId = None,
@@ -283,7 +286,7 @@ def update_delete_sell(trade_id):
         conn.close()
 
 def delete_buys(trade_id):
-    engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    # engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.delete(Buys).where(Buys.c.trade_id == trade_id)
 
