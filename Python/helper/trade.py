@@ -12,7 +12,7 @@ from binance.helpers import round_step_size
 
 conf = helper.config.initconfig()
 
-helper.sqlmanager.init()
+# helper.sqlmanager.init()
 
 kinds = ["Slow", "Middle"]#, "Fast"]
 
