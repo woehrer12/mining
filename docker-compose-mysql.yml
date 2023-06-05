@@ -14,7 +14,6 @@ services:
     restart: always
     networks:
       - mynetwork
-    network_mode: bridge
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -30,7 +29,6 @@ services:
       - 8183:80
     networks:
       - mynetwork
-    network_mode: bridge
 
   miningapi:
     depends_on:
@@ -44,7 +42,6 @@ services:
     - ./:/mining/
     networks:
       - mynetwork
-    network_mode: bridge
 
   grafana:
     depends_on:
@@ -59,7 +56,6 @@ services:
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
     restart: always
-    network_mode: bridge
 
 volumes:
   grafana:
