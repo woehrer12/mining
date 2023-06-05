@@ -56,19 +56,6 @@ services:
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
     restart: always
-    networks:
-      - mynetwork
-
-
-  # hiveos:
-  #   image: hiveos
-  #   container_name: hiveos
-  #   restart: always
-  #   volumes:
-  #   - ./:/mining/
 
 volumes:
   grafana:
-
-networks:
-  mynetwork:
