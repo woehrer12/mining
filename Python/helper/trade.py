@@ -66,7 +66,7 @@ def sell(Id):
     price = '{0:.8f}'.format(price)
     print("Preis: " + str(price))
     
-    size = float(trade.executedQty) * (1.0-(profit/100.0*0.2))
+    size = float(trade.executedQty) * (1.0-(abs(profit)/100.0*0.2))
     size = round_step_size(size,stepsize)
     print("Menge: "+ str(size))
     print("Profit: " + str(round(profit,2)) + "%")
@@ -170,12 +170,15 @@ def check_filled():
             if trade.kind == "Fast":
                 trailingvalue = 1.0
                 trailingoffset = 2.0
+                stoploss = -2
             elif trade.kind == "Middle":
                 trailingvalue = 2.5
                 trailingoffset = 5.0
+                stoploss = -5
             else:
                 trailingvalue = 5.0
                 trailingoffset = 10.0
+                stoploss = -10
             
 
             if profit > trailingoffset:
@@ -186,6 +189,13 @@ def check_filled():
                     if profit > trade.trailingProfit + trailingvalue:
                         trailing = profit - trailingvalue
                         helper.sqlmanager.update_trailing(trailing, trade.trade_id)
+
+            if trade.stoploss is not None:
+                if profit < trade.stoploss:
+                    logging.info("Sell with stoploss=%f", stoploss)
+                    logging.info(trade)
+                    sell(trade.trade_id)
+
             if not(not trade.trailingProfit):
                 if profit > 2.0:
                     if profit < trade.trailingProfit:
