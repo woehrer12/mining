@@ -29,6 +29,7 @@ Buys = db.Table('Buys', metadata,
             db.Column('side', db.String(8)),
             db.Column('sellId', db.BigInteger),
             db.Column('trailingProfit', db.Float),
+            db.Column('stoploss', db.Float),
             db.Column('kind', db.String(8)),
             )
 
@@ -195,7 +196,6 @@ def update_buys_Sell_status(status, trade_id):
     engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
     conn = engine.connect()
     query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
-                                                                    sellId = trade_id,
                                                                     sell_status = status
                                                                     )
     # Beginne eine Transaktion
@@ -220,6 +220,29 @@ def update_trailing(trailing, trade_id):
     conn = engine.connect()
     query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
                                                                     trailingProfit = trailing,
+                                                                    )
+    # Beginne eine Transaktion
+    trans = conn.begin()
+
+    try:
+        conn.execute(query)
+
+        # Bestätige die Transaktion
+        trans.commit()
+    except Exception as e:
+        logging.error("Fehler bei update trailing in sqlmanager.py: " + str(e))
+        print("Fehler bei update trailing in sqlmanager.py: " + str(e))
+        # Bei einem Fehler mache einen Rollback der Transaktion
+        trans.rollback()
+        raise
+    finally:
+        conn.close()
+
+def update_stoploss(stoploss, trade_id):
+    # engine = db.create_engine(connection_string, connect_args={'connect_timeout': 10})
+    conn = engine.connect()
+    query = db.update(Buys).where(Buys.c.trade_id == trade_id).values(
+                                                                    stoploss = stoploss,
                                                                     )
     # Beginne eine Transaktion
     trans = conn.begin()

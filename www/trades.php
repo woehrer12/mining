@@ -51,6 +51,7 @@
             echo "<th>Price</th>";
             echo "<th>Actual Price</th>";
             echo "<th>Trailing</th>";
+            echo "<th>Stoploss</th>";
             echo "<th>Percent</th>";
             echo "<th>Qty</th>";
             echo "<th>USDT</th>";
@@ -152,6 +153,7 @@
                 echo "<td>" . $row["price"] . "</td>";
                 echo "<td>" . $priceFormatted . "</td>";
                 echo "<td>". $row["trailingProfit"]. "</td>";
+                echo "<td>". $row["stoploss"]. "</td>";
                 echo "<td style='color: $color;'>" . round($percentageDifference, 2) . "% $arrow</td>";
                 echo "<td>" . $row["origQty"] . "</td>";
                 echo "<td>". $row["cummulativeQuoteQty"]. "</td>";
