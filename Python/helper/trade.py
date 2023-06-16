@@ -122,7 +122,8 @@ def check_order():
             result = helper.binance.check_order(trade.symbol,trade.sellId)
             if result['status'] == "FILLED":
                 helper.sqlmanager.update_buys_Sell_status(result['status'], trade.trade_id)
-                profit = float(((float(result['price']/float(trade.price)))*100)-100)
+                logging.info("Successfully updated status")
+                profit = float(((float(result['price'])/float(trade.price))*100)-100)
                 profit_USDT = float(result['cummulativeQuoteQty']) - trade.cummulativeQuoteQty
                 logging.info("Sell complete")
                 logging.info(trade)
@@ -190,8 +191,21 @@ def check_filled():
                         trailing = profit - trailingvalue
                         helper.sqlmanager.update_trailing(trailing, trade.trade_id)
 
-            if trade.stoploss is not None:
+            if trade.stoploss is None:
+                helper.sqlmanager.update_stoploss(trade.trade_id, stoploss)
+            else:
                 if profit < trade.stoploss:
+                    Coins = float(helper.binance.get_balance_pair(trade.symbol)['free'])
+                    if helper.sqlmanager.get_trade_protectionBuys():
+                        logging.info("Stoploss Sell Trade Time Protection")
+                        logging.info(trade)
+                    if helper.sqlmanager.get_trade_protectionSells():
+                        logging.info("Stoploss Sell Trade Time Protection Sell")
+                        logging.info(trade)
+                    if trade.executedQty > Coins:
+                        logging.info("Stoploss Sell Trade Balance Protection")
+                        logging.info(trade)
+
                     logging.info("Sell with stoploss=%f", stoploss)
                     logging.info(trade)
                     sell(trade.trade_id)
@@ -206,7 +220,7 @@ def check_filled():
                         if helper.sqlmanager.get_trade_protectionSells():
                             logging.info("Sell Trade Time Protection Sell")
                             logging.info(trade)
-                        elif trade.executedQty > Coins:
+                        if trade.executedQty > Coins:
                             logging.info("Sell Trade Balance Protection")
                             logging.info(trade)
                             helper.sqlmanager.update_trailing_to_null(trade.trade_id,trailing)
