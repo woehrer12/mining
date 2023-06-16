@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Aktuelles Datum und Uhrzeit</title>
+    <title>Tradeing</title>
     <style>
         body {
             background-color: #1c1c1e;

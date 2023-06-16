@@ -122,7 +122,7 @@ def check_order():
             result = helper.binance.check_order(trade.symbol,trade.sellId)
             if result['status'] == "FILLED":
                 helper.sqlmanager.update_buys_Sell_status(result['status'], trade.trade_id)
-                profit = float(((float(result['price']/trade.price))*100)-100)
+                profit = float(((float(result['price']/float(trade.price)))*100)-100)
                 profit_USDT = float(result['cummulativeQuoteQty']) - trade.cummulativeQuoteQty
                 logging.info("Sell complete")
                 logging.info(trade)
@@ -132,7 +132,7 @@ def check_order():
                 time_now = int(time.time())*1000
                 time_cancel = int(time_now - 3300000)
                 trade_time = int(trade.transactTime)
-                print("Pair: " + str(trade.symbol) + "  Price: " + str(trade.price) + "  Menge: " + str(trade.executedQty) + "  Time: " + str(datetime.datetime.fromtimestamp(trade.transacttime/1000)))
+                print("Pair: " + str(trade.symbol) + "  Price: " + str(trade.price) + "  Menge: " + str(trade.executedQty) + "  Time: " + str(datetime.datetime.fromtimestamp(int(trade.transactTime)/1000)))
                 if trade_time < time_cancel:
                     print("CANCEL")
                     logging.info("Cancel Sell")
