@@ -138,7 +138,7 @@ def check_order():
                     print("CANCEL")
                     logging.info("Cancel Sell")
                     logging.info(trade)
-                    cancel_orderSells(result, trade[13])
+                    cancel_orderSells(trade)
     except Exception as e:
         logging.error("Fehler bei checkorder open SELL in trade.py: " + str(e))
         print("Fehler bei checkorder in trade.py: " + str(e))
@@ -206,7 +206,7 @@ def check_filled():
                         logging.info("Stoploss Sell Trade Balance Protection")
                         logging.info(trade)
 
-                    logging.info("Sell with stoploss=%f", stoploss)
+                    logging.info("Sell with stoploss=%f, available Coins:=%f", stoploss, Coins)
                     logging.info(trade)
                     sell(trade.trade_id)
 
@@ -251,11 +251,11 @@ def cancel_orderBuys(trade_id,data):
         print("Fehler bei cancel_order Buys in trade.py: " + str(e))
         time.sleep(60)
 
-def cancel_orderSells(data, buyId):
+def cancel_orderSells(data):
     print(data)
     try:
-        helper.binance.cancel_order(data['symbol'],data['orderId'])
-        helper.sqlmanager.update_delete_sell(buyId, "")
+        helper.binance.cancel_order(data.symbol,data.sellId)
+        helper.sqlmanager.update_delete_sell(data.orderId, "")
     except Exception as e:
         logging.error("Fehler bei cancel_orderSells in trade.py: " + str(e))
         print("Fehler bei cancel_orderSells in trade.py: " + str(e))
