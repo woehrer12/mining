@@ -9,9 +9,9 @@ def handler(data):
     data['exit_long'] = 0
     data['strategy'] = ''
 
-    # data = RSI(data)
+    data = RSI(data)
 
-    data = ClucMay72018(data)
+    # data = ClucMay72018(data)
 
     return data
 

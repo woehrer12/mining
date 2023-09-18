@@ -191,50 +191,67 @@ def check_filled():
                         trailing = profit - trailingvalue
                         helper.sqlmanager.update_trailing(trailing, trade.trade_id)
 
-            if trade.stoploss is None:
-                helper.sqlmanager.update_stoploss(trade.trade_id, stoploss)
-            else:
-                if profit < trade.stoploss:
-                    Coins = float(helper.binance.get_balance_pair(trade.symbol)['free'])
-                    if helper.sqlmanager.get_trade_protectionBuys():
-                        logging.info("Stoploss Sell Trade Time Protection")
-                        logging.info(trade)
-                    if helper.sqlmanager.get_trade_protectionSells():
-                        logging.info("Stoploss Sell Trade Time Protection Sell")
-                        logging.info(trade)
-                    if trade.executedQty > Coins:
-                        logging.info("Stoploss Sell Trade Balance Protection")
-                        logging.info(trade)
 
-                    logging.info("Sell with stoploss=%f, available Coins:=%f", stoploss, Coins)
-                    logging.info(trade)
-                    sell(trade.trade_id)
+            ## Stoploss
 
-            if not(not trade.trailingProfit):
-                if profit > 2.0:
-                    if profit < trade.trailingProfit:
-                        Coins = float(helper.binance.get_balance_pair(trade.symbol)['free'])
-                        if helper.sqlmanager.get_trade_protectionBuys():
-                            logging.info("Sell Trade Time Protection")
+            if conf['reserve'] == 'True':
+                try:
+                    if trade.stoploss is None:
+                        helper.sqlmanager.update_stoploss(trade.trade_id, stoploss)
+                    else:
+                        if profit < trade.stoploss:
+                            Coins = float(helper.binance.get_balance_pair(trade.symbol)['free'])
+                            if helper.sqlmanager.get_trade_protectionBuys():
+                                logging.info("Stoploss Sell Trade Time Protection")
+                                logging.info(trade)
+                            if helper.sqlmanager.get_trade_protectionSells():
+                                logging.info("Stoploss Sell Trade Time Protection Sell")
+                                logging.info(trade)
+                            if trade.executedQty > Coins:
+                                logging.info("Stoploss Sell Trade Balance Protection")
+                                logging.info(trade)
+
+                            logging.info("Sell with stoploss=%f, available Coins:=%f", stoploss, Coins)
                             logging.info(trade)
-                        if helper.sqlmanager.get_trade_protectionSells():
-                            logging.info("Sell Trade Time Protection Sell")
-                            logging.info(trade)
-                        if trade.executedQty > Coins:
-                            logging.info("Sell Trade Balance Protection")
-                            logging.info(trade)
-                            helper.sqlmanager.update_trailing_to_null(trade.trade_id,trailing)
-                            logging.info("Set TradetoNULL")
-                            logging.info(trade)
-                            helper.telegramsend.send("Not Enought for Sell" + str(trade[0]) + " ID:" + str(trade[15]))
-                        else:
-                            print("SELL")
                             sell(trade.trade_id)
-                else:
-                    helper.sqlmanager.update_trailing_to_null(trade.trade_id)
-                    logging.info("Set TradetoNULL")
-                    logging.info(trade)
-                    helper.telegramsend.send("Reset Trailing while under 2%" + str(trade[0]) + " ID:" + str(trade[15]))
+                except Exception as e:
+                    logging.error("Fehler bei Stoploss check_filled in trade.py: " + str(e))
+                    print("Fehler bei Stoploss check_filled in trade.py: " + str(e))
+                    time.sleep(60)
+
+
+            ## Trailing Profit
+
+            try:
+                if not(not trade.trailingProfit):
+                    if profit > 2.0:
+                        if profit < trade.trailingProfit:
+                            Coins = float(helper.binance.get_balance_pair(trade.symbol)['free'])
+                            if helper.sqlmanager.get_trade_protectionBuys():
+                                logging.info("Sell Trade Time Protection")
+                                logging.info(trade)
+                            if helper.sqlmanager.get_trade_protectionSells():
+                                logging.info("Sell Trade Time Protection Sell")
+                                logging.info(trade)
+                            if trade.executedQty > Coins:
+                                logging.info("Sell Trade Balance Protection")
+                                logging.info(trade)
+                                helper.sqlmanager.update_trailing_to_null(trade.trade_id,trailing)
+                                logging.info("Set TradetoNULL")
+                                logging.info(trade)
+                                helper.telegramsend.send("Not Enought for Sell" + str(trade[0]) + " ID:" + str(trade[15]))
+                            else:
+                                print("SELL")
+                                sell(trade.trade_id)
+                    else:
+                        helper.sqlmanager.update_trailing_to_null(trade.trade_id)
+                        logging.info("Set TradetoNULL")
+                        logging.info(trade)
+                        helper.telegramsend.send("Reset Trailing while under 2%" + str(trade[0]) + " ID:" + str(trade[15]))
+            except Exception as e:
+                logging.error("Fehler bei Trailing Profit check_filled in trade.py: " + str(e))
+                print("Fehler bei Trailing Profitcheck_filled in trade.py: " + str(e))
+                time.sleep(60)
 
     except Exception as e:
         logging.error("Fehler bei check_filled in trade.py: " + str(e))
