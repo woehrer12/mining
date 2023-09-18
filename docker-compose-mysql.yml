@@ -59,14 +59,6 @@ services:
     networks:
       - mynetwork
 
-
-  # hiveos:
-  #   image: hiveos
-  #   container_name: hiveos
-  #   restart: always
-  #   volumes:
-  #   - ./:/mining/
-
 volumes:
   grafana:
 
