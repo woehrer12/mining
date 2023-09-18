@@ -56,6 +56,11 @@ services:
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
     restart: always
+    networks:
+      - mynetwork
 
 volumes:
   grafana:
+
+networks:
+  mynetwork:
