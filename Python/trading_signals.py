@@ -76,7 +76,7 @@ while True:
 
                 if helper.sqlmanager.get_trade_protectionBuys():
                     logging.info("Buy Trade Time Protection " + CurrencyPair)
-                if helper.sqlmanager.get_trade_protectionSells():
+                elif helper.sqlmanager.get_trade_protectionSells():
                     logging.info("Buy Trade Time Protection Sells " + CurrencyPair)
                 # TODO Portion
                 else:
