@@ -5,9 +5,7 @@ import datetime
 import logging
 
 import helper.binance
-import helper.predict
 import helper.sqlmanager
-# import helper.training
 import helper.config
 import helper.functions
 # import helper.sqlite
@@ -23,7 +21,6 @@ logger = helper.functions.initlogger("trading_signals.log")
 conf = helper.config.initconfig()
 
 CurrencyPairList = ["BTCUSDT","ETHUSDT","BNBUSDT","PAXGUSDT"]
-# CurrencyPairList = helper.predict.pairs()
 
 print("Trading Signals start")
 logging.info("Trading Signals start")
